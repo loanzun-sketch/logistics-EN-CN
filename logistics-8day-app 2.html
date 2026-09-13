@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<title>Logistics 8 Ngày — EN/CN cho dân XNK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#12233F; --navy-2:#1B3A63; --ink:#132033; --paper:#F2F4F1; --card:#FFFFFF;
+  --line:#DEE3DE; --amber:#DD7E1F; --amber-dk:#B8630F; --teal:#1E6F6A; --teal-l:#E4F2F0;
+  --amber-l:#FBEBD9; --red:#C4432E; --green:#2C8A5B; --muted:#5B6B72;
+  --radius:14px; --radius-sm:9px;
+  --shadow:0 1px 2px rgba(18,35,63,.06), 0 6px 20px rgba(18,35,63,.07);
+  font-size:16px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Manrope',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;}
+.mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);
+  position:relative;padding-bottom:14px;}
+button{font-family:inherit;cursor:pointer;}
+.hidden{display:none!important;}
+
+/* ---- top bar ---- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);}
+.topbar .back{background:none;border:none;color:#fff;font-size:20px;padding:4px 6px;border-radius:8px;}
+.topbar .back:active{background:rgba(255,255,255,.15);}
+.topbar .title{font-weight:800;font-size:15px;letter-spacing:.2px;}
+.topbar .sub{font-size:11px;color:#B7C4D8;margin-top:1px;}
+.stat-pill{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#fff;
+  background:rgba(255,255,255,.12);padding:4px 9px;border-radius:20px;}
+
+/* ---- home ---- */
+.home-hero{background:var(--navy);color:#fff;padding:22px 20px 28px;border-radius:0 0 26px 26px;}
+.home-hero .greet{font-size:13px;color:#9FB2CC;margin-bottom:2px;}
+.home-hero h1{margin:0 0 14px;font-size:22px;font-weight:800;}
+.hero-stats{display:flex;gap:10px;}
+.hero-stat{flex:1;background:rgba(255,255,255,.08);border-radius:var(--radius-sm);padding:10px 12px;}
+.hero-stat .num{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.hero-stat .lbl{font-size:11px;color:#AFC0D6;margin-top:2px;}
+.continue-btn{margin:16px 20px 6px;background:var(--amber);color:#fff;border:none;border-radius:var(--radius);
+  padding:15px 18px;font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center;
+  box-shadow:0 6px 18px rgba(221,126,31,.35);}
+.continue-btn small{display:block;font-weight:600;font-size:11.5px;opacity:.92;margin-top:2px;}
+
+.route{padding:20px 20px 8px;position:relative;}
+.route-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;}
+.port{display:flex;gap:14px;position:relative;padding-bottom:22px;}
+.port:last-child{padding-bottom:0;}
+.port .track{width:34px;display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.port .dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace;border:2px solid var(--line);background:#fff;color:var(--muted);z-index:2;}
+.port .dot.done{background:var(--teal);border-color:var(--teal);color:#fff;}
+.port .dot.active{background:var(--amber);border-color:var(--amber);color:#fff;box-shadow:0 0 0 5px var(--amber-l);}
+.port .dot.locked{color:#B7BFB8;}
+.port .rope{flex:1;width:2px;background:var(--line);margin-top:2px;}
+.port .rope.done{background:var(--teal);}
+.port-card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 13px;
+  margin-bottom:2px;}
+.port-card.locked{opacity:.55;}
+.port-card .d-num{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--amber-dk);font-weight:700;letter-spacing:.4px;}
+.port-card h3{margin:2px 0 2px;font-size:14.5px;font-weight:800;}
+.port-card .d-en{font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+.progress-bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;}
+.progress-bar i{display:block;height:100%;background:var(--teal);}
+.port-card .pct{font-size:10.5px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+
+.review-card{margin:6px 20px 18px;background:var(--teal-l);border:1px solid #BFE0DB;border-radius:var(--radius);
+  padding:14px 15px;}
+.review-card h4{margin:0 0 4px;font-size:14px;font-weight:800;color:var(--teal);}
+.review-card p{margin:0 0 10px;font-size:12.5px;color:#33564F;}
+.review-btn{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-weight:700;font-size:13px;}
+
+/* ---- lesson header / steps ---- */
+.steps-row{display:flex;gap:5px;padding:10px 16px 4px;background:var(--navy);}
+.step-chip{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.22);}
+.step-chip.done{background:var(--amber);}
+.step-chip.current{background:#fff;}
+
+.content{flex:1;padding:18px 18px 100px;}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber-dk);font-weight:700;letter-spacing:.4px;margin-bottom:4px;}
+h2.step-h{margin:0 0 4px;font-size:19px;font-weight:800;}
+.step-desc{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+
+.footer-bar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;background:linear-gradient(to top, var(--paper) 60%, transparent);
+  padding:14px 0 10px;pointer-events:none;}
+.footer-bar .inner{max-width:480px;width:100%;padding:0 18px;pointer-events:auto;display:flex;gap:10px;}
+.primary-btn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);padding:15px;
+  font-weight:800;font-size:15px;box-shadow:var(--shadow);}
+.primary-btn:disabled{background:#B8C0C6;box-shadow:none;}
+.primary-btn.amber{background:var(--amber);}
+.ghost-btn{background:#fff;border:1px solid var(--line);color:var(--ink);border-radius:var(--radius);padding:13px;font-weight:700;font-size:14px;width:100%;}
+
+/* ---- sentence page ---- */
+.sent-progress{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:6px;}
+.scard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin-bottom:14px;box-shadow:var(--shadow);}
+.scard .vi{font-size:13.5px;color:var(--muted);margin-bottom:8px;}
+.scard .en{font-size:18px;font-weight:800;color:var(--navy);}
+.scard .ipa{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-top:3px;}
+.scard .cn{font-size:18px;font-weight:700;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
+.scard .py{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);margin-top:3px;}
+.scard .toolrow{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+.tiny-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:700;color:var(--ink);}
+.tiny-btn.on{background:var(--amber-l);border-color:var(--amber);color:var(--amber-dk);}
+
+.mini-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-bottom:12px;box-shadow:var(--shadow);}
+.mini-box h4{margin:0 0 8px;font-size:12.5px;font-weight:800;color:var(--amber-dk);text-transform:uppercase;letter-spacing:.4px;}
+.mini-vocab-item{padding:8px 0;border-bottom:1px dashed var(--line);}
+.mini-vocab-item:last-child{border-bottom:none;}
+.mini-vocab-item .row1{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
+.mini-vocab-item .w-en{font-weight:800;color:var(--navy);font-size:14px;}
+.mini-vocab-item .w-pos{font-size:10px;font-weight:700;color:var(--teal);background:var(--teal-l);padding:1px 7px;border-radius:6px;white-space:nowrap;}
+.mini-vocab-item .w-ipa{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);}
+.mini-vocab-item .row2{margin-top:3px;font-size:13px;color:var(--ink);}
+.mini-vocab-item .w-cn{font-weight:700;}
+.mini-vocab-item .w-py{font-family:'JetBrains Mono',monospace;color:var(--teal);font-size:11.5px;}
+.mini-vocab-item .w-vi{color:var(--muted);}
+.gram-pattern{padding:8px 0;border-bottom:1px dashed var(--line);}
+.gram-pattern:last-child{border-bottom:none;}
+.gram-pattern .formula-box{font-family:'JetBrains Mono',monospace;background:var(--navy);color:#EFE7DA;padding:9px 11px;border-radius:8px;font-size:12.5px;line-height:1.5;margin-bottom:4px;}
+.gram-pattern .note{font-size:12.5px;color:var(--muted);}
+
+.write-box{background:#FFFDF7;border:1.5px dashed var(--amber);border-radius:var(--radius);padding:15px;margin-bottom:12px;}
+.write-box h4{margin:0 0 4px;font-size:13px;font-weight:800;color:var(--amber-dk);}
+.write-box .prompt-vi{font-size:15px;font-weight:700;margin-bottom:10px;}
+.write-box label{font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
+
+.sent-nav{display:flex;gap:10px;margin-top:6px;}
+.sent-nav button{flex:1;}
+
+.summary-section{margin-bottom:18px;}
+.summary-section h3{font-size:15px;margin:0 0 10px;}
+
+/* ---- exercise ---- */
+.q-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow);margin-bottom:14px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber-dk);font-weight:700;margin-bottom:6px;}
+.q-text{font-size:16px;font-weight:700;margin-bottom:14px;line-height:1.4;}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:11px;
+  padding:12px 14px;margin-bottom:9px;font-size:14.5px;font-weight:600;color:var(--ink);}
+.opt.correct{border-color:var(--green);background:#EAF7EF;color:#1E6B41;}
+.opt.wrong{border-color:var(--red);background:#FCEDEA;color:#9B3423;}
+.fb{margin-top:12px;padding:11px 13px;border-radius:10px;font-size:13.5px;line-height:1.5;}
+.fb.ok{background:#EAF7EF;color:#1E6B41;}
+.fb.bad{background:#FCEDEA;color:#9B3423;}
+.text-input{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:12px 14px;font-size:15px;font-family:inherit;margin-bottom:10px;}
+.text-input:focus{outline:none;border-color:var(--amber);}
+.check-btn{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:13.5px;}
+.word-score{display:inline-block;margin:2px 3px;padding:2px 7px;border-radius:6px;font-size:13.5px;font-weight:700;}
+.word-score.hit{background:#EAF7EF;color:#1E6B41;}
+.word-score.miss{background:#FCEDEA;color:#9B3423;}
+
+/* ---- mode tabs ---- */
+.level-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.level-tab{flex:1;text-align:center;padding:9px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:12.5px;color:var(--muted);}
+.level-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.play-big{width:100%;background:var(--teal);color:#fff;border:none;border-radius:var(--radius);padding:22px;font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;}
+
+/* ---- test result ---- */
+.score-ring{width:160px;height:160px;border-radius:50%;margin:14px auto 8px;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;position:relative;}
+.score-ring .num{font-size:38px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.score-ring .lbl{font-size:12px;color:var(--muted);}
+.cat-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+.cat-row b{font-family:'JetBrains Mono',monospace;}
+
+.xp-toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;
+  padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:60;box-shadow:var(--shadow);}
+
+.empty-note{background:var(--card);border:1px dashed var(--line);border-radius:var(--radius);padding:22px;text-align:center;color:var(--muted);font-size:13.5px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============ DATA ============ */
+const DATA = [{"id": 1, "vi": "Chào hàng & Báo giá", "en": "Inquiry & Quotation", "context": "Học phần này giúp bạn làm chủ các mẫu câu khởi đầu giao dịch, hỏi giá, đàm phán điều kiện thanh toán sơ bộ và xử lý yêu cầu hàng mẫu. Áp dụng khi giao dịch trực tiếp với nhà cung cấp hoặc khách hàng quốc tế.", "vocab": [{"en": "quotation", "vi": "báo giá", "cn": "报价", "py": "bàojià", "ipa": "/kwəʊˈteɪʃən/", "pos": "danh từ"}, {"en": "send", "vi": "gửi", "cn": "发", "py": "fā", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "payment", "vi": "thanh toán", "cn": "付款", "py": "fùkuǎn", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "terms", "vi": "điều kiện", "cn": "条件", "py": "tiáojiàn", "ipa": "/tɜːmz/", "pos": "danh từ"}, {"en": "customer", "vi": "khách hàng", "cn": "客户", "py": "kèhù", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "cargo", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "insurance", "vi": "bảo hiểm", "cn": "保险", "py": "bǎoxiǎn", "ipa": "/ɪnˈʃʊərəns/", "pos": "danh từ"}, {"en": "require", "vi": "yêu cầu", "cn": "需要", "py": "xūyào", "ipa": "/rɪˈkwaɪə/", "pos": "động từ"}, {"en": "special", "vi": "đặc biệt", "cn": "特殊", "py": "tèshū", "ipa": "/ˈspɛʃəl/", "pos": "tính từ"}, {"en": "packaging", "vi": "bao bì", "cn": "包装", "py": "bāozhuāng", "ipa": "/ˈpækɪdʒɪŋ/", "pos": "danh từ"}, {"en": "order", "vi": "đặt hàng", "cn": "订货", "py": "dìnghuò", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "based on", "vi": "dựa theo", "cn": "根据", "py": "gēnjù", "ipa": "/beɪst ɒn/", "pos": "cụm giới từ"}, {"en": "confirm", "vi": "xác nhận", "cn": "确认", "py": "quèrèn", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "price", "vi": "giá", "cn": "价格", "py": "jiàgé", "ipa": "/praɪs/", "pos": "danh từ"}, {"en": "delivery", "vi": "giao hàng", "cn": "交货", "py": "jiāohuò", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}, {"en": "sample", "vi": "mẫu", "cn": "样品", "py": "yàngpǐn", "ipa": "/ˈsɑːmpəl/", "pos": "danh từ"}, {"en": "bulk order", "vi": "đơn hàng số lượng lớn", "cn": "大批量订购", "py": "dà pīliàng dìnggòu", "ipa": "/bʌlk ˈɔːdə/", "pos": "cụm danh từ"}, {"en": "goods", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "ready", "vi": "sẵn sàng", "cn": "准备好", "py": "zhǔnbèi hǎo", "ipa": "/ˈrɛdi/", "pos": "tính từ"}, {"en": "check", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "quality", "vi": "chất lượng", "cn": "质量", "py": "zhìliàng", "ipa": "/ˈkwɒlɪti/", "pos": "danh từ"}, {"en": "product", "vi": "sản phẩm", "cn": "产品", "py": "chǎnpǐn", "ipa": "/ˈprɒdʌkt/", "pos": "danh từ"}, {"en": "export", "vi": "xuất khẩu", "cn": "出口", "py": "chūkǒu", "ipa": "/ˈɛkspɔːt/", "pos": "danh từ / động từ"}, {"en": "photo", "vi": "ảnh", "cn": "照片", "py": "zhàopiàn", "ipa": "/ˈfəʊtəʊ/", "pos": "danh từ"}, {"en": "supplier", "vi": "nhà cung cấp", "cn": "供应商", "py": "gōngyìngshāng", "ipa": "/səˈplaɪə/", "pos": "danh từ"}, {"en": "work with", "vi": "hợp tác", "cn": "合作", "py": "hézuò", "ipa": "/wɜːk wɪð/", "pos": "cụm động từ"}, {"en": "reduce", "vi": "giảm", "cn": "降低", "py": "jiàngdī", "ipa": "/rɪˈdjuːs/", "pos": "động từ"}, {"en": "logistics", "vi": "logistics", "cn": "物流", "py": "wùliú", "ipa": "/ləˈdʒɪstɪks/", "pos": "danh từ"}, {"en": "cost", "vi": "chi phí", "cn": "成本", "py": "chéngběn", "ipa": "/kɒst/", "pos": "danh từ"}, {"en": "profit", "vi": "lợi nhuận", "cn": "利润", "py": "lìrùn", "ipa": "/ˈprɒfɪt/", "pos": "danh từ"}, {"en": "review", "vi": "xem xét lại", "cn": "重新评估", "py": "chóngxīn pínggū", "ipa": "/rɪˈvjuː/", "pos": "động từ"}, {"en": "international", "vi": "quốc tế", "cn": "国际", "py": "guójì", "ipa": "/ˌɪntəˈnæʃənl/", "pos": "tính từ"}, {"en": "shipping", "vi": "vận chuyển", "cn": "运输", "py": "yùnshū", "ipa": "/ˈʃɪpɪŋ/", "pos": "danh từ"}, {"en": "technical", "vi": "kỹ thuật", "cn": "技术", "py": "jìshù", "ipa": "/ˈtɛknɪkəl/", "pos": "tính từ"}, {"en": "drawing", "vi": "bản vẽ", "cn": "图纸", "py": "túzhǐ", "ipa": "/ˈdrɔːɪŋ/", "pos": "danh từ"}, {"en": "specification", "vi": "thông số", "cn": "规格", "py": "guīgé", "ipa": "/ˌspɛsɪfɪˈkeɪʃən/", "pos": "danh từ"}, {"en": "employee", "vi": "nhân viên", "cn": "员工", "py": "yuángōng", "ipa": "/ɪmˈplɔɪiː/", "pos": "danh từ"}, {"en": "negotiation", "vi": "đàm phán", "cn": "谈判", "py": "tánpàn", "ipa": "/nɪˌɡəʊʃiˈeɪʃən/", "pos": "danh từ"}, {"en": "skill", "vi": "kỹ năng", "cn": "能力", "py": "nénglì", "ipa": "/skɪl/", "pos": "danh từ"}, {"en": "schedule", "vi": "lịch/kế hoạch", "cn": "计划", "py": "jìhuà", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "increase", "vi": "tăng", "cn": "增加", "py": "zēngjiā", "ipa": "/ɪnˈkriːs/", "pos": "động từ"}, {"en": "order volume", "vi": "số lượng đơn hàng", "cn": "订单量", "py": "dìngdān liàng", "ipa": "/ˈɔːdə ˈvɒljuːm/", "pos": "cụm danh từ"}, {"en": "processing time", "vi": "thời gian xử lý", "cn": "处理时间", "py": "chǔlǐ shíjiān", "ipa": "/ˈprəʊsɛsɪŋ taɪm/", "pos": "cụm danh từ"}, {"en": "usual", "vi": "bình thường", "cn": "平时", "py": "píngshí", "ipa": "/ˈjuːʒʊəl/", "pos": "tính từ"}, {"en": "provide", "vi": "cung cấp", "cn": "提供", "py": "tígōng", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "pickup", "vi": "lấy hàng", "cn": "提货", "py": "tíhuò", "ipa": "/ˈpɪkʌp/", "pos": "danh từ"}, {"en": "address", "vi": "địa chỉ", "cn": "地址", "py": "dìzhǐ", "ipa": "/əˈdrɛs/", "pos": "danh từ"}], "sentences": [{"v": "Bạn có thể gửi tôi báo giá?", "e": "Could you send me a quotation?", "f": "/kʊd juː send miː ə kwəʊˈteɪʃən/", "c": "你能给我发个报价吗？", "y": "Nǐ néng gěi wǒ fā gè bàojià ma?", "vocab": [{"en": "quotation", "cn": "报价", "py": "bàojià", "vi": "báo giá", "ipa": "/kwəʊˈteɪʃən/", "pos": "danh từ"}, {"en": "send", "cn": "发", "py": "fā", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}], "gram": [{"en": "Could + S + V...?", "cn": "你能 + V + 吗？", "note": "Có thể... không?"}]}, {"v": "Điều kiện thanh toán là gì?", "e": "What are the payment terms?", "f": "/wɒt ɑː ðə ˈpeɪmənt tɜːmz/", "c": "付款条件是什么？", "y": "Fùkuǎn tiáojiàn shì shénme?", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "terms", "cn": "条件", "py": "tiáojiàn", "vi": "điều kiện", "ipa": "/tɜːmz/", "pos": "danh từ"}], "gram": [{"en": "What + be + S?", "cn": "S + 是 + 什么？", "note": "...là gì?"}]}, {"v": "Vui lòng gửi báo giá mới cho khách hàng.", "e": "Please send a new quotation to the customer.", "f": "/pliːz send ə njuː kwəʊˈteɪʃən tuː ðə ˈkʌstəmə/", "c": "请给客户发个新报价。", "y": "Qǐng gěi kèhù fā gè xīn bàojià.", "vocab": [{"en": "quotation", "cn": "报价", "py": "bàojià", "vi": "báo giá", "ipa": "/kwəʊˈteɪʃən/", "pos": "danh từ"}, {"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O + to + người", "cn": "请 + 给 + người + V + O", "note": "Vui lòng làm gì đó cho ai."}]}, {"v": "Hàng có cần bảo hiểm không?", "e": "Does the cargo need insurance?", "f": "/dʌz ðə ˈkɑːɡəʊ niːd ɪnˈʃʊərəns/", "c": "货物需要保险吗？", "y": "Huòwù xūyào bǎoxiǎn ma?", "vocab": [{"en": "cargo", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "insurance", "cn": "保险", "py": "bǎoxiǎn", "vi": "bảo hiểm", "ipa": "/ɪnˈʃʊərəns/", "pos": "danh từ"}], "gram": [{"en": "Does + S + V...?", "cn": "S + V + 吗？", "note": "Có... không?"}]}, {"v": "Hàng có yêu cầu bao bì đặc biệt nào không?", "e": "Does the cargo require any special packaging?", "f": "/dʌz ðə ˈkɑːɡəʊ rɪˈkwaɪə ˈɛni ˈspɛʃəl ˈpækɪʤɪŋ/", "c": "货物需要任何特殊包装吗？", "y": "Huòwù xūyào rènhé tèshū bāozhuāng ma?", "vocab": [{"en": "require", "cn": "需要", "py": "xūyào", "vi": "yêu cầu", "ipa": "/rɪˈkwaɪə/", "pos": "động từ"}, {"en": "special", "cn": "特殊", "py": "tèshū", "vi": "đặc biệt", "ipa": "/ˈspɛʃəl/", "pos": "tính từ"}, {"en": "packaging", "cn": "包装", "py": "bāozhuāng", "vi": "bao bì", "ipa": "/ˈpækɪdʒɪŋ/", "pos": "danh từ"}], "gram": [{"en": "Does + S + V...?", "cn": "S + 需要 + O + 吗？", "note": "Có yêu cầu/cần... không?"}]}, {"v": "Chúng tôi muốn đặt hàng theo báo giá của anh chị.", "e": "We would like to order based on your quotation.", "f": "/wiː wʊd laɪk tuː ˈɔːdə beɪst ɒn jɔː kwəʊˈteɪʃən/", "c": "我们想根据您的报价订货。", "y": "Wǒmen xiǎng gēnjù nín de bàojià dìnghuò.", "vocab": [{"en": "order", "cn": "订货", "py": "dìnghuò", "vi": "đặt hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "based on", "cn": "根据", "py": "gēnjù", "vi": "dựa theo", "ipa": "/beɪst ɒn/", "pos": "cụm giới từ"}], "gram": [{"en": "would like to + V", "cn": "想 + V", "note": "Muốn làm gì (cách nói lịch sự)."}]}, {"v": "Xin vui lòng xác nhận giá và thời gian giao hàng.", "e": "Please confirm the price and delivery time.", "f": "/pliːz kənˈfɜːm ðə praɪs ænd dɪˈlɪvəri taɪm/", "c": "请确认价格和交货时间。", "y": "Qǐng quèrèn jiàgè hé jiāohuò shíjiān.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "price", "cn": "价格", "py": "jiàgé", "vi": "giá", "ipa": "/praɪs/", "pos": "danh từ"}, {"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng làm gì."}]}, {"v": "Chúng tôi cần mẫu trước khi đặt hàng số lượng lớn.", "e": "We need samples before placing a bulk order.", "f": "/wiː niːd ˈsɑːmplz bɪˈfɔː ˈpleɪsɪŋ ə bʌlk ˈɔːdə/", "c": "我们在大批量订购前需要样品。", "y": "Wǒmen zài dà pīliàng dìnggòu qián xūyào yàngpǐn.", "vocab": [{"en": "sample", "cn": "样品", "py": "yàngpǐn", "vi": "mẫu", "ipa": "/ˈsɑːmpəl/", "pos": "danh từ"}, {"en": "bulk order", "cn": "大批量订购", "py": "dà pīliàng dìnggòu", "vi": "đơn hàng số lượng lớn", "ipa": "/bʌlk ˈɔːdə/", "pos": "cụm danh từ"}], "gram": [{"en": "before + V-ing", "cn": "V + 前", "note": "Trước khi làm gì."}]}, {"v": "Bao giờ hàng sẽ sẵn sàng để giao?", "e": "When will the goods be ready for delivery?", "f": "/wɛn wɪl ðə ɡʊdz biː ˈrɛdi fɔː dɪˈlɪvəri/", "c": "货物什么时候可以交货？", "y": "Huòwù shénme shíhòu kěyǐ jiāohuò?", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "ready", "cn": "准备好", "py": "zhǔnbèi hǎo", "vi": "sẵn sàng", "ipa": "/ˈrɛdi/", "pos": "tính từ"}, {"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}], "gram": [{"en": "When + will + S + V?", "cn": "S + 什么时候 + 可以 + V?", "note": "Hỏi về thời điểm: Khi nào... ?"}]}, {"v": "Chúng tôi đang kiểm tra chất lượng hàng hoá.", "e": "We are checking the quality of the goods.", "f": "/wiː ɑː ˈtʃɛkɪŋ ðə ˈkwɒlɪti ɒv ðə ɡʊdz/", "c": "我们正在检查货物的质量。", "y": "Wǒmen zhèngzài jiǎnchá huòwù de zhìliàng.", "vocab": [{"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "quality", "cn": "质量", "py": "zhìliàng", "vi": "chất lượng", "ipa": "/ˈkwɒlɪti/", "pos": "danh từ"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "đang làm gì"}]}, {"v": "Chúng tôi cần kiểm tra chất lượng sản phẩm trước khi xuất khẩu.", "e": "We need to check the product quality before exporting.", "f": "/wiː niːd tuː tʃɛk ðə ˈprɒdʌkt ˈkwɒlɪti bɪˈfɔː ɪksˈpɔːtɪŋ/", "c": "我们需要在出口前检查产品质量。", "y": "Wǒmen xūyào zài chūkǒu qián jiǎnchá chǎnpǐn zhìliàng.", "vocab": [{"en": "product", "cn": "产品", "py": "chǎnpǐn", "vi": "sản phẩm", "ipa": "/ˈprɒdʌkt/", "pos": "danh từ"}, {"en": "export", "cn": "出口", "py": "chūkǒu", "vi": "xuất khẩu", "ipa": "/ˈɛkspɔːt/", "pos": "danh từ / động từ"}], "gram": [{"en": "need to + V / before + V-ing", "cn": "需要 + V / V + 前", "note": "Cần làm gì / trước khi làm gì."}]}, {"v": "Bạn có thể gửi hình ảnh hàng hoá không?", "e": "Can you send photos of the goods?", "f": "/kæn juː send ˈfəʊtəʊz ɒv ðə ɡʊdz/", "c": "你能发送货物的照片吗？", "y": "Nǐ néng fāsòng huòwù de zhàopiàn ma?", "vocab": [{"en": "photo", "cn": "照片", "py": "zhàopiàn", "vi": "ảnh", "ipa": "/ˈfəʊtəʊ/", "pos": "danh từ"}, {"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}], "gram": [{"en": "Can + S + V...?", "cn": "S + 能 + V + 吗？", "note": "Có thể... không?"}]}, {"v": "Chúng tôi đang làm việc với một nhà cung cấp ở Trung Quốc.", "e": "We are working with a supplier in China.", "f": "/wiː ɑː ˈwɜːkɪŋ wɪð ə səˈplaɪər ɪn ˈtʃaɪnə/", "c": "我们正在与一家中国供应商合作。", "y": "Wǒmen zhèngzài yǔ yījiā Zhōngguó gōngyìngshāng hézuò.", "vocab": [{"en": "supplier", "cn": "供应商", "py": "gōngyìngshāng", "vi": "nhà cung cấp", "ipa": "/səˈplaɪə/", "pos": "danh từ"}, {"en": "work with", "cn": "合作", "py": "hézuò", "vi": "hợp tác", "ipa": "/wɜːk wɪð/", "pos": "cụm động từ"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"v": "Chúng tôi cần giảm chi phí logistics để tối ưu hoá lợi nhuận.", "e": "We need to reduce logistics costs to optimize profit.", "f": "/wiː niːd tuː rɪˈdjuːs lɒˈʤɪstɪks kɒsts tuː ˈɒptɪmaɪz ˈprɒfɪt/", "c": "我们需要降低物流成本以优化利润。", "y": "Wǒmen xūyào jiàngdī wùliú chéngběn yǐ yōuhuà lìrùn.", "vocab": [{"en": "reduce", "cn": "降低", "py": "jiàngdī", "vi": "giảm", "ipa": "/rɪˈdjuːs/", "pos": "động từ"}, {"en": "logistics", "cn": "物流", "py": "wùliú", "vi": "logistics", "ipa": "/ləˈdʒɪstɪks/", "pos": "danh từ"}, {"en": "cost", "cn": "成本", "py": "chéngběn", "vi": "chi phí", "ipa": "/kɒst/", "pos": "danh từ"}, {"en": "profit", "cn": "利润", "py": "lìrùn", "vi": "lợi nhuận", "ipa": "/ˈprɒfɪt/", "pos": "danh từ"}], "gram": [{"en": "to + V", "cn": "以 + V", "note": "để..."}]}, {"v": "Chúng ta cần xem xét lại chi phí vận chuyển quốc tế.", "e": "We need to review international shipping costs.", "f": "/wiː niːd tuː rɪˈvjuː ˌɪntəˈnæʃənl ˈʃɪpɪŋ kɒsts/", "c": "我们需要重新评估国际运输费用。", "y": "Wǒmen xūyào chóngxīn pínggū guójì yùnshū fèiyòng.", "vocab": [{"en": "review", "cn": "重新评估", "py": "chóngxīn pínggū", "vi": "xem xét lại", "ipa": "/rɪˈvjuː/", "pos": "động từ"}, {"en": "international", "cn": "国际", "py": "guójì", "vi": "quốc tế", "ipa": "/ˌɪntəˈnæʃənl/", "pos": "tính từ"}, {"en": "shipping", "cn": "运输", "py": "yùnshū", "vi": "vận chuyển", "ipa": "/ˈʃɪpɪŋ/", "pos": "danh từ"}, {"en": "cost", "cn": "费用", "py": "fèiyòng", "vi": "chi phí", "ipa": "/kɒst/", "pos": "danh từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Xin vui lòng gửi bản vẽ kĩ thuật hoặc thông số kĩ thuật.", "e": "Please send the technical drawings or specifications.", "f": "/pliːz send ðə ˈtɛknɪkəl ˈdrɔːɪŋz ɔː ˌspɛsɪfɪˈkeɪʃənz/", "c": "请发送技术图纸或规格。", "y": "Qǐng fāsòng jìshù túzhǐ huò guīgé.", "vocab": [{"en": "technical", "cn": "技术", "py": "jìshù", "vi": "kỹ thuật", "ipa": "/ˈtɛknɪkəl/", "pos": "tính từ"}, {"en": "drawing", "cn": "图纸", "py": "túzhǐ", "vi": "bản vẽ", "ipa": "/ˈdrɔːɪŋ/", "pos": "danh từ"}, {"en": "specification", "cn": "规格", "py": "guīgé", "vi": "thông số", "ipa": "/ˌspɛsɪfɪˈkeɪʃən/", "pos": "danh từ"}], "gram": [{"en": "A or B", "cn": "A 或 B", "note": "hoặc A hoặc B"}]}, {"v": "Họ đang tìm kiếm một nhân viên có kỹ năng đàm phán tốt.", "e": "They are looking for an employee with good negotiation skills.", "f": "/ðeɪ ɑː ˈlʊkɪŋ fɔːr æn ˌɛmplɔɪˈiː wɪð ɡʊd nɪˌɡəʊʃɪˈeɪʃən skɪlz/", "c": "他们正在寻找一名具有良好谈判能力的员工。", "y": "Tāmen zhèngzài xúnzhǎo yī míng jùyǒu liánghǎo tánpàn nénglì de yuángōng.", "vocab": [{"en": "employee", "cn": "员工", "py": "yuángōng", "vi": "nhân viên", "ipa": "/ɪmˈplɔɪiː/", "pos": "danh từ"}, {"en": "negotiation", "cn": "谈判", "py": "tánpàn", "vi": "đàm phán", "ipa": "/nɪˌɡəʊʃiˈeɪʃən/", "pos": "danh từ"}, {"en": "skill", "cn": "能力", "py": "nénglì", "vi": "kỹ năng", "ipa": "/skɪl/", "pos": "danh từ"}], "gram": [{"en": "employee + with + đặc điểm", "cn": "具有...的 + danh từ", "note": "Trung: phần mô tả thường đứng trước danh từ + 的."}]}, {"v": "Tôi cần kiểm tra lịch giao hàng trước khi xác nhận với khách hàng.", "e": "I need to check the delivery schedule before confirming with the customer.", "f": "/aɪ niːd tuː tʃɛk ðə dɪˈlɪvəri ˈʃɛdjuːl bɪˈfɔː kənˈfɜːmɪŋ wɪð ðə ˈkʌstəmə/", "c": "我需要在向客户确认之前先检查交货计划。", "y": "Wǒ xūyào zài xiàng kèhù quèrèn zhīqián xiān jiǎnchá jiāohuò jìhuà.", "vocab": [{"en": "schedule", "cn": "计划", "py": "jìhuà", "vi": "lịch/kế hoạch", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}], "gram": [{"en": "before + V-ing", "cn": "在 + ... + 之前", "note": "trước khi..."}]}, {"v": "Do số lượng đơn hàng tăng đáng kể trong tháng này, thời gian xử lý đơn hàng có thể lâu hơn bình thường.", "e": "Due to a significant increase in order volume this month, the order processing time may be longer than usual.", "f": "/djuː tuː ə sɪɡˈnɪfɪkənt ɪnˈkriːs ɪn ˈɔːdə ˈvɒljuːm ðɪs mʌnθ, ðɪ ˈɔːdə ˈprəʊsɛsɪŋ taɪm meɪ biː ˈlɒŋɡə ðæn ˈjuːʒʊəl/", "c": "由于本月订单量显著增加，订单处理时间可能会比平时长。", "y": "Yóuyú běnyuè dìngdān liàng xiǎnzhù zēngjiā, dìngdān chǔlǐ shíjiān kěnéng huì bǐ píngshí cháng.", "vocab": [{"en": "increase", "cn": "增加", "py": "zēngjiā", "vi": "tăng", "ipa": "/ɪnˈkriːs/", "pos": "động từ"}, {"en": "order volume", "cn": "订单量", "py": "dìngdān liàng", "vi": "số lượng đơn hàng", "ipa": "/ˈɔːdə ˈvɒljuːm/", "pos": "cụm danh từ"}, {"en": "processing time", "cn": "处理时间", "py": "chǔlǐ shíjiān", "vi": "thời gian xử lý", "ipa": "/ˈprəʊsɛsɪŋ taɪm/", "pos": "cụm danh từ"}, {"en": "usual", "cn": "平时", "py": "píngshí", "vi": "bình thường", "ipa": "/ˈjuːʒʊəl/", "pos": "tính từ"}], "gram": [{"en": "due to + N", "cn": "由于 + mệnh đề", "note": "do/bởi vì"}, {"en": "longer than", "cn": "比 + ... + tính từ", "note": "lâu/dài hơn..."}]}, {"v": "Bạn có thể cho biết địa chỉ lấy hàng được không?", "e": "Could you please provide the pickup address?", "f": "/kʊd juː pliːz prəˈvaɪd ðə ˈpɪkʌp əˈdrɛs/", "c": "你能提供提货地址吗？", "y": "Nǐ néng tígōng tíhuò dìzhǐ ma?", "vocab": [{"en": "provide", "cn": "提供", "py": "tígōng", "vi": "cung cấp", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "pickup", "cn": "提货", "py": "tíhuò", "vi": "lấy hàng", "ipa": "/ˈpɪkʌp/", "pos": "danh từ"}, {"en": "address", "cn": "地址", "py": "dìzhǐ", "vi": "địa chỉ", "ipa": "/əˈdrɛs/", "pos": "danh từ"}], "gram": [{"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}], "gramCore": [{"en": "Could + S + V...?", "cn": "你能 + V + 吗？", "note": "Có thể... không?"}, {"en": "What + be + S?", "cn": "S + 是 + 什么？", "note": "...là gì?"}, {"en": "Please + V + O + to + người", "cn": "请 + 给 + người + V + O", "note": "Vui lòng làm gì đó cho ai."}, {"en": "Does + S + V...?", "cn": "S + V + 吗？", "note": "Có... không?"}, {"en": "would like to + V", "cn": "想 + V", "note": "Muốn làm gì (cách nói lịch sự)."}, {"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng làm gì."}, {"en": "before + V-ing", "cn": "V + 前", "note": "Trước khi làm gì."}, {"en": "When + will + S + V?", "cn": "S + 什么时候 + 可以 + V?", "note": "Hỏi về thời điểm: Khi nào... ?"}, {"en": "be + V-ing", "cn": "正在 + V", "note": "đang làm gì"}, {"en": "need to + V / before + V-ing", "cn": "需要 + V / V + 前", "note": "Cần làm gì / trước khi làm gì."}, {"en": "Can + S + V...?", "cn": "S + 能 + V + 吗？", "note": "Có thể... không?"}, {"en": "to + V", "cn": "以 + V", "note": "để..."}, {"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}, {"en": "A or B", "cn": "A 或 B", "note": "hoặc A hoặc B"}, {"en": "employee + with + đặc điểm", "cn": "具有...的 + danh từ", "note": "Trung: phần mô tả thường đứng trước danh từ + 的."}, {"en": "due to + N", "cn": "由于 + mệnh đề", "note": "do/bởi vì"}, {"en": "longer than", "cn": "比 + ... + tính từ", "note": "lâu/dài hơn..."}, {"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}, {"id": 2, "vi": "Đặt hàng & Đặt chỗ", "en": "Ordering & Booking", "context": "Tập trung vào quy trình xác nhận đơn đặt hàng chính thức (PO), thương lượng thời gian sản xuất và thực hiện đặt chỗ (booking) container với hãng tàu hoặc forwarder.", "vocab": [{"en": "purchase order", "vi": "đơn đặt hàng", "cn": "采购订单", "py": "cǎigòu dìngdān", "ipa": "/ˈpɜːtʃəs ˈɔːdə/", "pos": "cụm danh từ"}, {"en": "confirm", "vi": "xác nhận", "cn": "确认", "py": "quèrèn", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "receipt", "vi": "nhận được", "cn": "收到", "py": "shōudào", "ipa": "/rɪˈsiːt/", "pos": "danh từ"}, {"en": "production lead time", "vi": "thời gian sản xuất", "cn": "生产交期", "py": "shēngchǎn jiāoqī", "ipa": "/prəˈdʌkʃən liːd taɪm/", "pos": "cụm danh từ"}, {"en": "order", "vi": "đơn hàng", "cn": "订单", "py": "dìngdān", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "progress", "vi": "tiến độ", "cn": "进度", "py": "jìndù", "ipa": "/ˈprəʊɡrɛs/", "pos": "danh từ"}, {"en": "customer", "vi": "khách hàng", "cn": "客户", "py": "kèhù", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "booking", "vi": "đặt chỗ", "cn": "订舱", "py": "dìngcāng", "ipa": "/ˈbʊkɪŋ/", "pos": "danh từ"}, {"en": "shipping line", "vi": "hãng tàu", "cn": "船公司", "py": "chuán gōngsī", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}, {"en": "booking confirmation", "vi": "xác nhận đặt chỗ", "cn": "订舱确认", "py": "dìngcāng quèrèn", "ipa": "/ˈbʊkɪŋ ˌkɒnfəˈmeɪʃən/", "pos": "cụm danh từ"}, {"en": "send", "vi": "gửi", "cn": "发送", "py": "fāsòng", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "shipping schedule", "vi": "lịch tàu", "cn": "船期", "py": "chuánqī", "ipa": "/ˈʃɪpɪŋ ˈʃɛdjuːl/", "pos": "cụm danh từ"}, {"en": "schedule change", "vi": "thay đổi lịch trình", "cn": "行程变更", "py": "xíngchéng biàngēng", "ipa": "/ˈʃɛdjuːl tʃeɪndʒ/", "pos": "cụm danh từ"}, {"en": "delayed", "vi": "chậm trễ", "cn": "延误", "py": "yánwù", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "schedule", "vi": "lịch/kế hoạch", "cn": "计划", "py": "jìhuà", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "goods", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "committed", "vi": "cam kết", "cn": "承诺", "py": "chéngnuò", "ipa": "/kəˈmɪtɪd/", "pos": "tính từ"}, {"en": "delivery", "vi": "giao hàng", "cn": "交货", "py": "jiāohuò", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}, {"en": "track", "vi": "theo dõi", "cn": "跟踪", "py": "gēnzōng", "ipa": "/træk/", "pos": "động từ"}, {"en": "cargo", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "vessel", "vi": "tàu", "cn": "船", "py": "chuán", "ipa": "/ˈvɛsl/", "pos": "danh từ"}, {"en": "warehouse", "vi": "kho", "cn": "仓库", "py": "cāngkù", "ipa": "/ˈwɛəhaʊs/", "pos": "danh từ"}, {"en": "packing", "vi": "đóng gói", "cn": "包装", "py": "bāozhuāng", "ipa": "/ˈpækɪŋ/", "pos": "danh từ"}, {"en": "port", "vi": "cảng", "cn": "港口", "py": "gǎngkǒu", "ipa": "/pɔːt/", "pos": "danh từ"}], "sentences": [{"v": "Chúng tôi đã gửi (PO) rồi đấy.", "e": "We have already sent the Purchase Order (PO).", "f": "/wiː hæv ɔːlˈrɛdi send ðə ˈpɜːtʃəs ˈɔːdə (piː-əʊ)/", "c": "我们已经发了采购订单。", "y": "Wǒmen yǐjīng fāle cǎigòu dìngdān.", "vocab": [{"en": "purchase order", "cn": "采购订单", "py": "cǎigòu dìngdān", "vi": "đơn đặt hàng", "ipa": "/ˈpɜːtʃəs ˈɔːdə/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Xin vui lòng xác nhận đã nhận được đơn đặt hàng.", "e": "Please confirm receipt of the purchase order.", "f": "/pliːz kənˈfɜːm rɪˈsiːt ɒv ðə ˈpɜːtʃəs ˈɔːdə/", "c": "请确认收到采购订单。", "y": "Qǐng quèrèn shōudào cǎigòu dìngdān.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "receipt", "cn": "收到", "py": "shōudào", "vi": "nhận được", "ipa": "/rɪˈsiːt/", "pos": "danh từ"}, {"en": "purchase order", "cn": "采购订单", "py": "cǎigòu dìngdān", "vi": "đơn đặt hàng", "ipa": "/ˈpɜːtʃəs ˈɔːdə/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Xin vui lòng xác nhận thời gian sản xuất.", "e": "Please confirm the production lead time.", "f": "/pliːz kənˈfɜːm ðə prəˈdʌkʃən liːd taɪm/", "c": "请确认生产交期。", "y": "Qǐng quèrèn shēngchǎn jiāoqī.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "production lead time", "cn": "生产交期", "py": "shēngchǎn jiāoqī", "vi": "thời gian sản xuất", "ipa": "/prəˈdʌkʃən liːd taɪm/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Vui lòng cập nhật tiến độ đơn hàng.", "e": "Please update the order progress.", "f": "/pliːz ʌpˈdeɪt ðɪ ˈɔːdə ˈprəʊɡrəs/", "c": "请更新订单进度。", "y": "Qǐng gēngxīn dìngdān jìndù.", "vocab": [{"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "progress", "cn": "进度", "py": "jìndù", "vi": "tiến độ", "ipa": "/ˈprəʊɡrɛs/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Đơn hàng này đã được xác nhận bởi khách hàng.", "e": "This order has been confirmed by the customer.", "f": "/ðɪs ˈɔːdə hæz biːn kənˈfɜːmd baɪ ðə ˈkʌstəmə/", "c": "该订单已由客户确认。", "y": "Gāi dìngdān yǐ yóu kèhù quèrèn.", "vocab": [{"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Chúng tôi chưa nhận được booking từ hãng tàu.", "e": "We haven't received the booking from the shipping line.", "f": "/wiː ˈhævnt rɪˈsiːvd ðə ˈbʊkɪŋ frɒm ðə ˈʃɪpɪŋ laɪn/", "c": "我们还没有收到船公司的订舱。", "y": "Wǒmen hái méiyǒu shōudào chuán gōngsī de dìngcāng.", "vocab": [{"en": "booking", "cn": "订舱", "py": "dìngcāng", "vi": "đặt chỗ", "ipa": "/ˈbʊkɪŋ/", "pos": "danh từ"}, {"en": "shipping line", "cn": "船公司", "py": "chuán gōngsī", "vi": "hãng tàu", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Chúng tôi đã đặt chỗ với hãng tàu rồi.", "e": "We have already booked with the shipping line.", "f": "/wiː hæv ɔːlˈrɛdi bʊkt wɪð ðə ˈʃɪpɪŋ laɪn/", "c": "我们已经向船公司订舱了。", "y": "Wǒmen yǐjīng xiàng chuán gōngsī dìngcāng le.", "vocab": [{"en": "shipping line", "cn": "船公司", "py": "chuán gōngsī", "vi": "hãng tàu", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Chúng tôi đã nhận được xác nhận booking của anh chị rồi.", "e": "We have received your booking confirmation.", "f": "/wiː hæv rɪˈsiːvd jɔː ˈbʊkɪŋ ˌkɒnfəˈmeɪʃən/", "c": "我们已经收到您的订舱确认。", "y": "Wǒmen yǐjīng shōudào nín de dìngcāng quèrèn.", "vocab": [{"en": "booking confirmation", "cn": "订舱确认", "py": "dìngcāng quèrèn", "vi": "xác nhận đặt chỗ", "ipa": "/ˈbʊkɪŋ ˌkɒnfəˈmeɪʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Chúng tôi sẽ gửi xác nhận booking trong ít phút nữa.", "e": "We will send the booking confirmation in a few minutes.", "f": "/wiː wɪl send ðə ˈbʊkɪŋ ˌkɒnfəˈmeɪʃən ɪn ə fjuː ˈmɪnɪts/", "c": "我们会在几分钟内发送订舱确认。", "y": "Wǒmen huì zài jǐ fēnzhōng nèi fāsòng dìngcāng quèrèn.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "booking confirmation", "cn": "订舱确认", "py": "dìngcāng quèrèn", "vi": "xác nhận đặt chỗ", "ipa": "/ˈbʊkɪŋ ˌkɒnfəˈmeɪʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Vui lòng xác nhận lịch tàu.", "e": "Please confirm the shipping schedule.", "f": "/pliːz kənˈfɜːm ðə ˈʃɪpɪŋ ˈʃɛdjuːl/", "c": "请确认船期。", "y": "Qǐng quèrèn chuánqī.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "shipping schedule", "cn": "船期", "py": "chuánqī", "vi": "lịch tàu", "ipa": "/ˈʃɪpɪŋ ˈʃɛdjuːl/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Chúng tôi sẽ gửi lịch tàu sớm nhất cho anh chị nha.", "e": "We will send you the shipping schedule as soon as possible.", "f": "/wiː wɪl send juː ðə ˈʃɪpɪŋ ˈʃɛdjuːl æz suːn æz ˈpɒsəbl/", "c": "我们会尽快给您发送船期表。", "y": "Wǒmen huì jǐnkuài gěi nín fāsòng chuánqī biǎo.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "shipping schedule", "cn": "船期", "py": "chuánqī", "vi": "lịch tàu", "ipa": "/ˈʃɪpɪŋ ˈʃɛdjuːl/", "pos": "cụm danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Hãng tàu vừa thông báo thay đổi lịch trình.", "e": "The shipping line has just announced a schedule change.", "f": "/ðə ˈʃɪpɪŋ laɪn hæz ʤʌst əˈnaʊnst ə ˈʃɛdjuːl tʃeɪnʤ/", "c": "船公司刚刚通知行程变更。", "y": "Chuán gōngsī gānggāng tōngzhī xíngchéng biàngēng.", "vocab": [{"en": "shipping line", "cn": "船公司", "py": "chuán gōngsī", "vi": "hãng tàu", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}, {"en": "schedule change", "cn": "行程变更", "py": "xíngchéng biàngēng", "vi": "thay đổi lịch trình", "ipa": "/ˈʃɛdjuːl tʃeɪndʒ/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Nếu có thay đổi về lịch tàu, chúng tôi sẽ thông báo ngay cho bạn.", "e": "If there are any changes to the shipping schedule, we will notify you immediately.", "f": "/ɪf ðeər ɑːr ˈɛni ˈtʃeɪnʤɪz tuː ðə ˈʃɪpɪŋ ˈʃɛdjuːl, wiː wɪl ˈnəʊtɪfaɪ juː ɪˈmiːdiətli/", "c": "船期如有变动，我们会立即通知您。", "y": "Chuánqī rúyǒu biàndòng, wǒmen huì lìjí tōngzhī nín.", "vocab": [{"en": "shipping schedule", "cn": "船期", "py": "chuánqī", "vi": "lịch tàu", "ipa": "/ˈʃɪpɪŋ ˈʃɛdjuːl/", "pos": "cụm danh từ"}], "gram": [{"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"v": "Đơn hàng có đang bị chậm so với kế hoạch không?", "e": "Is the order delayed compared to the schedule?", "f": "/ɪz ðɪ ˈɔːdə dɪˈleɪd kəmˈpeəd tuː ðə ˈʃɛdjuːl/", "c": "订单是否比计划延误？", "y": "Dìngdān shìfǒu bǐ jìhuà yánwù?", "vocab": [{"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "schedule", "cn": "计划", "py": "jìhuà", "vi": "lịch/kế hoạch", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}], "gram": [{"en": "Is/Have + S + V3?", "cn": "S + V + 了 + 吗？", "note": "Hỏi về kết quả một việc đã/đang xảy ra."}]}, {"v": "Chúng tôi mong muốn nhận hàng đúng thời gian đã cam kết.", "e": "We wish to receive the goods on the committed delivery time.", "f": "/wiː wɪʃ tuː rɪˈsiːv ðə ɡʊdz ɒn ðə kəˈmɪtɪd dɪˈlɪvəri taɪm/", "c": "我们希望按承诺的时间收货。", "y": "Wǒmen xīwàng àn chéngnuò de shíjiān shōuhuò.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "committed", "cn": "承诺", "py": "chéngnuò", "vi": "cam kết", "ipa": "/kəˈmɪtɪd/", "pos": "tính từ"}, {"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi sẽ theo dõi lô hàng cho đến khi hàng lên tàu.", "e": "We will track the shipment until the cargo is loaded onto the vessel.", "f": "/wiː wɪl træk ðə ˈʃɪpmənt ʌnˈtɪl ðə ˈkɑːɡəʊ ɪz ˈləʊdɪd ˈɒntuː ðə ˈvɛsl/", "c": "我们将跟踪货物，直到其装船。", "y": "Wǒmen jiāng gēnzōng huòwù, zhídào qí zhuāngchuán.", "vocab": [{"en": "track", "cn": "跟踪", "py": "gēnzōng", "vi": "theo dõi", "ipa": "/træk/", "pos": "động từ"}, {"en": "cargo", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "vessel", "cn": "船", "py": "chuán", "vi": "tàu", "ipa": "/ˈvɛsl/", "pos": "danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Hàng đã được giao cho hãng tàu.", "e": "The goods have been delivered to the shipping line.", "f": "/ðə ɡʊdz hæv biːn dɪˈlɪvəd tuː ðə ˈʃɪpɪŋ laɪn/", "c": "货物已交付给船公司。", "y": "Huòwù yǐ jiāofù gěi chuán gōngsī.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "shipping line", "cn": "船公司", "py": "chuán gōngsī", "vi": "hãng tàu", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Vui lòng sắp xếp nhận hàng.", "e": "Please arrange to receive the goods.", "f": "/pliːz əˈreɪnʤ tuː rɪˈsiːv ðə ɡʊdz/", "c": "请安排收货。", "y": "Qǐng ānpái shōuhuò.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Bộ phận kho đã hoàn tất việc đóng gói hàng hoá vào chiều nay.", "e": "The warehouse department has completed packing the goods this afternoon.", "f": "/ðə ˈweəhaʊs dɪˈpɑːtmənt hæz kəmˈpliːtɪd ˈpækɪŋ ðə ɡʊdz ðɪs ˌɑːftəˈnuːn/", "c": "仓库部门今天下午已完成货物包装。", "y": "Cāngkù bùmén jīntiān xiàwǔ yǐ wánchéng huòwù bāozhuāng.", "vocab": [{"en": "warehouse", "cn": "仓库", "py": "cāngkù", "vi": "kho", "ipa": "/ˈwɛəhaʊs/", "pos": "danh từ"}, {"en": "packing", "cn": "包装", "py": "bāozhuāng", "vi": "đóng gói", "ipa": "/ˈpækɪŋ/", "pos": "danh từ"}, {"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Hàng hoá sẽ được giao đến cảng vào chiều nay.", "e": "The goods will be delivered to the port this afternoon.", "f": "/ðə ɡʊdz wɪl biː dɪˈlɪvəd tuː ðə pɔːt ðɪs ˌɑːftəˈnuːn/", "c": "货物将于今天下午运抵港口。", "y": "Huòwù jiāng yú jīntiān xiàwǔ yùndǐ gǎngkǒu.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}], "gramCore": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}, {"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}, {"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}, {"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}, {"en": "Is/Have + S + V3?", "cn": "S + V + 了 + 吗？", "note": "Hỏi về kết quả một việc đã/đang xảy ra."}, {"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"id": 3, "vi": "Chứng từ Vận tải", "en": "Shipping Documents", "context": "Cực kỳ quan trọng với nhân viên chứng từ xuất nhập khẩu: kiểm tra tính đồng nhất của Invoice, Packing List, Bill of Lading và SI.", "vocab": [{"en": "provide", "vi": "cung cấp", "cn": "提供", "py": "tígōng", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "invoice", "vi": "hóa đơn", "cn": "发票", "py": "fāpiào", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}, {"en": "shipping documents", "vi": "chứng từ vận chuyển", "cn": "运输单据", "py": "yùnshū dānjù", "ipa": "/ˈʃɪpɪŋ ˈdɒkjʊmənts/", "pos": "cụm danh từ"}, {"en": "send", "vi": "gửi", "cn": "发送", "py": "fāsòng", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "packing list", "vi": "phiếu đóng gói", "cn": "装箱单", "py": "zhuāngxiāngdān", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}, {"en": "scan of the documents", "vi": "bản scan chứng từ", "cn": "单据扫描件", "py": "dānjù sǎomiáo jiàn", "ipa": "/skæn ɒv ðə ˈdɒkjʊmənts/", "pos": "cụm danh từ"}, {"en": "export documents", "vi": "chứng từ xuất khẩu", "cn": "出口单据", "py": "chūkǒu dānjù", "ipa": "/ˈɛkspɔːt ˈdɒkjʊmənts/", "pos": "cụm danh từ"}, {"en": "customs declaration", "vi": "hồ sơ khai báo hải quan", "cn": "报关文件", "py": "bàoguān wénjiàn", "ipa": "/ˈkʌstəmz ˌdɛkləˈreɪʃən/", "pos": "cụm danh từ"}, {"en": "customer", "vi": "khách hàng", "cn": "客户", "py": "kèhù", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "bill of lading", "vi": "vận đơn", "cn": "提单", "py": "tídān", "ipa": "/bɪl ɒv ˈleɪdɪŋ/", "pos": "cụm danh từ"}, {"en": "confirm", "vi": "xác nhận", "cn": "确认", "py": "quèrèn", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "seller", "vi": "người bán", "cn": "卖方", "py": "màifāng", "ipa": "/ˈsɛlə/", "pos": "danh từ"}, {"en": "soft copy", "vi": "bản mềm", "cn": "电子版", "py": "diànzǐ bǎn", "ipa": "/sɒft ˈkɒpi/", "pos": "cụm danh từ"}, {"en": "cargo description", "vi": "mô tả hàng hoá", "cn": "货物描述", "py": "huòwù miáoshù", "ipa": "/ˈkɑːɡəʊ dɪsˈkrɪpʃən/", "pos": "cụm danh từ"}, {"en": "signed and stamped", "vi": "đã ký và đóng dấu", "cn": "签字盖章", "py": "qiānzì gàizhāng", "ipa": "/saɪnd ænd stæmpt/", "pos": "cụm tính từ"}, {"en": "commercial invoice", "vi": "hóa đơn thương mại", "cn": "商业发票", "py": "shāngyè fāpiào", "ipa": "/kəˈmɜːʃəl ˈɪnvɔɪs/", "pos": "cụm danh từ"}, {"en": "product", "vi": "sản phẩm", "cn": "产品", "py": "chǎnpǐn", "ipa": "/ˈprɒdʌkt/", "pos": "danh từ"}, {"en": "check", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "cargo", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "unit price", "vi": "đơn giá", "cn": "单价", "py": "dānjià", "ipa": "/ˈjuːnɪt praɪs/", "pos": "cụm danh từ"}, {"en": "revised invoice", "vi": "hoá đơn chỉnh sửa", "cn": "修改后的发票", "py": "xiūgǎi hòu de fāpiào", "ipa": "/rɪˈvaɪzd ˈɪnvɔɪs/", "pos": "cụm danh từ"}, {"en": "cut-off time", "vi": "thời hạn cut-off", "cn": "截止时间", "py": "jiézhǐ shíjiān", "ipa": "/ˈkʌtɒf taɪm/", "pos": "cụm danh từ"}, {"en": "shipping instructions", "vi": "SI (chỉ thị gửi hàng)", "cn": "补料", "py": "bǔliào", "ipa": "/ˈʃɪpɪŋ ɪnˈstrʌkʃənz/", "pos": "cụm danh từ"}, {"en": "issue", "vi": "phát hành", "cn": "签发", "py": "qiānfā", "ipa": "/ˈɪʃuː/", "pos": "động từ"}], "sentences": [{"v": "Bạn có thể cung cấp hoá đơn được không?", "e": "Could you provide the invoice?", "f": "/kʊd juː prəˈvaɪd ðə ˈɪnvɔɪs/", "c": "你能提供发票吗？", "y": "Nǐ néng tígōng fāpiào ma?", "vocab": [{"en": "provide", "cn": "提供", "py": "tígōng", "vi": "cung cấp", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}], "gram": [{"en": "Could + S + V...?", "cn": "你能 + V + 吗？", "note": "Có thể... không? (lịch sự)"}]}, {"v": "Chúng tôi cần các chứng từ vận chuyển.", "e": "We need the shipping documents.", "f": "/wiː niːd ðə ˈʃɪpɪŋ ˈdɒkjʊmənts/", "c": "我们需要运输单据。", "y": "Wǒmen xūyào yùnshū dānjù.", "vocab": [{"en": "shipping documents", "cn": "运输单据", "py": "yùnshū dānjù", "vi": "chứng từ vận chuyển", "ipa": "/ˈʃɪpɪŋ ˈdɒkjʊmənts/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Bạn có thể gửi danh sách đóng gói được không?", "e": "Could you please send the packing list?", "f": "/kʊd juː pliːz send ðə ˈpækɪŋ lɪst/", "c": "你能发送装箱单吗？", "y": "Nǐ néng fāsòng zhuāngxiāngdān ma?", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "packing list", "cn": "装箱单", "py": "zhuāngxiāngdān", "vi": "phiếu đóng gói", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}], "gram": [{"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}, {"v": "Bạn có thể gửi bản scan chứng từ được không?", "e": "Could you please send a scan of the documents?", "f": "/kʊd juː pliːz send ə skæn ɒv ðə ˈdɒkjʊmənts/", "c": "你能发一份单据扫描件吗？", "y": "Nǐ néng fā yī fèn dānjù sǎomiáo jiàn?", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "scan of the documents", "cn": "单据扫描件", "py": "dānjù sǎomiáo jiàn", "vi": "bản scan chứng từ", "ipa": "/skæn ɒv ðə ˈdɒkjʊmənts/", "pos": "cụm danh từ"}], "gram": [{"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}, {"v": "Bạn vui lòng gửi hoá đơn và danh sách hàng hoá giúp tôi nhé.", "e": "Please send the invoice and packing list for me.", "f": "/pliːz send ðə ˈɪnvɔɪs ænd ˈpækɪŋ lɪst fɔː miː/", "c": "请帮我发送发票和装箱单。", "y": "Qǐng bāng wǒ fāsòng fāpiào hé zhuāngxiāngdān.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}, {"en": "packing list", "cn": "装箱单", "py": "zhuāngxiāngdān", "vi": "phiếu đóng gói", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Chúng tôi cần thêm thời gian để chuẩn bị chứng từ xuất khẩu.", "e": "We need more time to prepare the export documents.", "f": "/wiː niːd mɔː taɪm tuː prɪˈpeə ðɪ ˈɛkspɔːt ˈdɒkjʊmənts/", "c": "我们需要更多时间来准备出口单据。", "y": "Wǒmen xūyào gèng duō shíjiān lái zhǔnbèi chūkǒu dānjù.", "vocab": [{"en": "export documents", "cn": "出口单据", "py": "chūkǒu dānjù", "vi": "chứng từ xuất khẩu", "ipa": "/ˈɛkspɔːt ˈdɒkjʊmənts/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Bộ phận chứng từ đang chuẩn bị hồ sơ khai báo hải quan.", "e": "The documentation department is preparing the customs declaration files.", "f": "/ðə ˌdɒkjʊmɛnˈteɪʃən dɪˈpɑːtmənt ɪz prɪˈpeərɪŋ ðə ˈkʌstəmz ˌdɛkləˈreɪʃən faɪlz/", "c": "单证部门正在准备报关文件。", "y": "Dānzhèng bùmén zhèngzài zhǔnbèi bàoguān wénjiàn.", "vocab": [{"en": "customs declaration", "cn": "报关文件", "py": "bàoguān wénjiàn", "vi": "hồ sơ khai báo hải quan", "ipa": "/ˈkʌstəmz ˌdɛkləˈreɪʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Khách hàng yêu cầu bản scan vận đơn trước.", "e": "The customer requested a scan of the Bill of Lading first.", "f": "/ðə ˈkʌstəmə rɪˈkwɛstɪd ə skæn ɒv ðə bɪl ɒv ˈleɪdɪŋ fɜːst/", "c": "客户要求先发提单扫描件。", "y": "Kèhù yāoqiú xiān fā tídān sǎomiáo jiàn.", "vocab": [{"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "bill of lading", "cn": "提单", "py": "tídān", "vi": "vận đơn", "ipa": "/bɪl ɒv ˈleɪdɪŋ/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi cần hoá đơn để tiếp tục xử lý lô hàng này.", "e": "We need the invoice to proceed with this shipment.", "f": "/wiː niːd ðə ˈɪnvɔɪs tuː prəˈsiːd wɪð ðɪs ˈʃɪpmənt/", "c": "我们需要发票来继续处理这批货物。", "y": "Wǒmen xūyào fāpiào lái jìxù chǔlǐ zhè pī huòwù.", "vocab": [{"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Xin vui lòng xác nhận tên người bán.", "e": "Please confirm the seller's name.", "f": "/pliːz kənˈfɜːm ðə ˈsɛləz neɪm/", "c": "请确认卖方名称。", "y": "Qǐng quèrèn màifāng míngchēng.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "seller", "cn": "卖方", "py": "màifāng", "vi": "người bán", "ipa": "/ˈsɛlə/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Vui lòng gửi bản mềm của hoá đơn.", "e": "Please send a soft copy of the invoice.", "f": "/pliːz send ə sɒft ˈkɒpi ɒv ðə ˈɪnvɔɪs/", "c": "请发送发票的电子版。", "y": "Qǐng fāsòng fāpiào de diànzǐ bǎn.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "soft copy", "cn": "电子版", "py": "diànzǐ bǎn", "vi": "bản mềm", "ipa": "/sɒft ˈkɒpi/", "pos": "cụm danh từ"}, {"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Xin vui lòng kiểm tra lại mô tả hàng hoá.", "e": "Please recheck the cargo description.", "f": "/pliːz riːˈtʃɛk ðə ˈkɑːɡəʊ dɪsˈkrɪpʃən/", "c": "请重新检查货物描述。", "y": "Qǐng chóngxīn jiǎnchá huòwù miáoshù.", "vocab": [{"en": "cargo description", "cn": "货物描述", "py": "huòwù miáoshù", "vi": "mô tả hàng hoá", "ipa": "/ˈkɑːɡəʊ dɪsˈkrɪpʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Sau khi nhận được hoá đơn, chúng tôi sẽ tiếp tục xử lý.", "e": "After receiving the invoice, we will proceed with processing.", "f": "/ˈɑːftə rɪˈsiːvɪŋ ðə ˈɪnvɔɪs, wiː wɪl prəˈsiːd wɪð ˈprəʊsɛsɪŋ/", "c": "收到发票后，我们将继续处理。", "y": "Shōudào fāpiào hòu, wǒmen jiāng jìxù chǔlǐ.", "vocab": [{"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Bạn có thể vui lòng gửi cho chúng tôi hoá đơn thương mại đã ký và đóng dấu được không?", "e": "Could you please send us the signed and stamped commercial invoice?", "f": "/kʊd juː pliːz send ʌs ðə saɪnd ænd stæmpt kəˈmɜːʃəl ˈɪnvɔɪs/", "c": "您能把签字盖章的商业发票发给我们吗？", "y": "Nín néng bǎ qiānzì gàizhāng de shāngyè fāpiào fā gěi wǒmen ma?", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "signed and stamped", "cn": "签字盖章", "py": "qiānzì gàizhāng", "vi": "đã ký và đóng dấu", "ipa": "/saɪnd ænd stæmpt/", "pos": "cụm tính từ"}, {"en": "commercial invoice", "cn": "商业发票", "py": "shāngyè fāpiào", "vi": "hóa đơn thương mại", "ipa": "/kəˈmɜːʃəl ˈɪnvɔɪs/", "pos": "cụm danh từ"}], "gram": [{"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}, {"v": "Thông tin trên hoá đơn chưa khớp với danh mục hàng hoá.", "e": "The information on the invoice does not match the product list.", "f": "/ðɪ ˌɪnfəˈmeɪʃən ɒn ðə ˈɪnvɔɪs dʌz nɒt mætʃ ðə ˈprɒdʌkt lɪst/", "c": "发票上的信息与商品清单不符。", "y": "Fāpiào shàng de xìnxī yǔ shāngpǐn qīngdān bùfú.", "vocab": [{"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}, {"en": "product", "cn": "产品", "py": "chǎnpǐn", "vi": "sản phẩm", "ipa": "/ˈprɒdʌkt/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Vui lòng kiểm tra lại số lượng hàng hoá trên hoá đơn.", "e": "Please check the cargo quantity on the invoice again.", "f": "/pliːz tʃɛk ðə ˈkɑːɡəʊ ˈkwɒntɪti ɒn ðə ˈɪnvɔɪs əˈɡɛn/", "c": "请再次核对发票上的货物数量。", "y": "Qǐng zàicì héduì fāpiào shàng de huòwù shùliàng.", "vocab": [{"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "cargo", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Kiểm tra lại đơn giá của từng mặt hàng.", "e": "Check the unit price of each item.", "f": "/tʃɛk ðə ˈjuːnɪt praɪs ɒv iːtʃ ˈaɪtəm/", "c": "核对每项商品的单价。", "y": "Héduì měi xiàng shāngpǐn de dānjià.", "vocab": [{"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "unit price", "cn": "单价", "py": "dānjià", "vi": "đơn giá", "ipa": "/ˈjuːnɪt praɪs/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi không thể tiếp tục xử lý cho đến khi nhận được hoá đơn chỉnh sửa.", "e": "We cannot proceed with processing until we receive the revised invoice.", "f": "/wiː ˈkænɒt prəˈsiːd wɪð ˈprəʊsɛsɪŋ ʌnˈtɪl wiː rɪˈsiːv ðə rɪˈvaɪzd ˈɪnvɔɪs/", "c": "在收到修改后的发票之前，我们无法继续处理。", "y": "Zài shōudào xiūgǎi hòu de fāpiào zhīqián, wǒmen wúfǎ jìxù chǔlǐ.", "vocab": [{"en": "revised invoice", "cn": "修改后的发票", "py": "xiūgǎi hòu de fāpiào", "vi": "hoá đơn chỉnh sửa", "ipa": "/rɪˈvaɪzd ˈɪnvɔɪs/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Xin vui lòng gửi chứng từ trước thời hạn cut-off.", "e": "Please send the documents before the cut-off time.", "f": "/pliːz send ðə ˈdɒkjʊmənts bɪˈfɔː ðə ˈkʌtɒf taɪm/", "c": "请在截止时间（Cut-off）前发送单据。", "y": "Qǐng zài jiézhǐ shíjiān (Cut-off) qián fāsòng dānjù.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "cut-off time", "cn": "截止时间", "py": "jiézhǐ shíjiān", "vi": "thời hạn cut-off", "ipa": "/ˈkʌtɒf taɪm/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Hiện tại chỉ còn thiếu SI để hoàn thành hồ sơ thôi.", "e": "Currently, only the Shipping Instructions (SI) are missing to complete the file.", "f": "/ˈkʌrəntli, ˈəʊnli ðə ˈʃɪpɪŋ ɪnˈstrʌkʃənz (ɛs-aɪ) ɑː ˈmɪsɪŋ tuː kəmˈpliːt ðə faɪl/", "c": "目前只缺补料（SI）就可以完成建档了。", "y": "Mùqián zhǐ quē bǔliào (SI) jiù kěyǐ wánchéng jiàndǎng le.", "vocab": [{"en": "shipping instructions", "cn": "补料", "py": "bǔliào", "vi": "SI (chỉ thị gửi hàng)", "ipa": "/ˈʃɪpɪŋ ɪnˈstrʌkʃənz/", "pos": "cụm danh từ"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"v": "Xin vui lòng kiểm tra lại trước khi chúng tôi phát hành vận đơn.", "e": "Please check again before we issue the Bill of Lading.", "f": "/pliːz tʃɛk əˈɡɛn bɪˈfɔː wiː ˈɪʃuː ðə bɪl ɒv ˈleɪdɪŋ/", "c": "在我们签发提单前，请再次核对。", "y": "Zài wǒmen qiānfā tídān qián, qǐng zàicì héduì.", "vocab": [{"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "issue", "cn": "签发", "py": "qiānfā", "vi": "phát hành", "ipa": "/ˈɪʃuː/", "pos": "động từ"}, {"en": "bill of lading", "cn": "提单", "py": "tídān", "vi": "vận đơn", "ipa": "/bɪl ɒv ˈleɪdɪŋ/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}], "gramCore": [{"en": "Could + S + V...?", "cn": "你能 + V + 吗？", "note": "Có thể... không? (lịch sự)"}, {"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}, {"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}, {"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}, {"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"id": 4, "vi": "Theo dõi Lộ trình & Lịch tàu", "en": "Tracking & Status", "context": "Hướng dẫn cách theo dõi tiến độ di chuyển của lô hàng, cập nhật ETA, quản lý thông tin thay đổi từ hãng tàu và cập nhật lịch trình cho khách hàng.", "vocab": [{"en": "week", "vi": "tuần", "cn": "周", "py": "zhōu", "ipa": "/wiːk/", "pos": "danh từ"}, {"en": "delayed", "vi": "chậm trễ", "cn": "延误", "py": "yánwù", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "bad weather", "vi": "thời tiết xấu", "cn": "恶劣天气", "py": "èliè tiānqì", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}, {"en": "check", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "shipping", "vi": "vận chuyển", "cn": "运输", "py": "yùnshū", "ipa": "/ˈʃɪpɪŋ/", "pos": "danh từ"}, {"en": "status", "vi": "tình trạng", "cn": "状态", "py": "zhuàngtài", "ipa": "/ˈsteɪtəs/", "pos": "danh từ"}, {"en": "customer", "vi": "khách hàng", "cn": "客户", "py": "kèhù", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "delivery address", "vi": "địa chỉ giao hàng", "cn": "送货地址", "py": "sònghuò dìzhǐ", "ipa": "/dɪˈlɪvəri əˈdrɛs/", "pos": "cụm danh từ"}, {"en": "container", "vi": "container", "cn": "集装箱", "py": "jízhuāngxiāng", "ipa": "/kənˈteɪnə/", "pos": "danh từ"}, {"en": "port", "vi": "cảng", "cn": "港口", "py": "gǎngkǒu", "ipa": "/pɔːt/", "pos": "danh từ"}, {"en": "delivery", "vi": "giao hàng", "cn": "交货", "py": "jiāohuò", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}, {"en": "progress", "vi": "tiến độ", "cn": "进度", "py": "jìndù", "ipa": "/ˈprəʊɡrɛs/", "pos": "danh từ"}, {"en": "shipping schedule", "vi": "lịch tàu", "cn": "船期", "py": "chuánqī", "ipa": "/ˈʃɪpɪŋ ˈʃɛdjuːl/", "pos": "cụm danh từ"}, {"en": "contact", "vi": "liên hệ", "cn": "联系", "py": "liánxì", "ipa": "/ˈkɒntækt/", "pos": "động từ"}, {"en": "in transit", "vi": "đang vận chuyển", "cn": "仍在运输中", "py": "réng zài yùnshū zhōng", "ipa": "/ɪn ˈtrænzɪt/", "pos": "cụm trạng từ"}, {"en": "port of destination", "vi": "cảng đích", "cn": "目的港", "py": "mùdì gǎng", "ipa": "/pɔːt ɒv ˌdɛstɪˈneɪʃən/", "pos": "cụm danh từ"}, {"en": "goods", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "berth", "vi": "cập cảng", "cn": "靠泊", "py": "kàobó", "ipa": "/bɜːθ/", "pos": "động từ"}, {"en": "monitor", "vi": "theo dõi", "cn": "跟踪", "py": "gēnzōng", "ipa": "/ˈmɒnɪtə/", "pos": "động từ"}, {"en": "cargo", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "misdelivery", "vi": "giao nhầm", "cn": "错投", "py": "cuòtóu", "ipa": "/ˌmɪsdɪˈlɪvəri/", "pos": "danh từ"}, {"en": "schedule", "vi": "lịch/kế hoạch", "cn": "计划", "py": "jìhuà", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "departure", "vi": "thời gian khởi hành", "cn": "离港时间", "py": "lígǎng shíjiān", "ipa": "/dɪˈpɑːtʃə/", "pos": "danh từ"}, {"en": "estimated time of arrival", "vi": "thời gian dự kiến đến (ETA)", "cn": "预计到港时间", "py": "yùjì dào gǎng shíjiān", "ipa": "/ˈɛstɪmeɪtɪd taɪm ɒv əˈraɪvəl/", "pos": "cụm danh từ"}, {"en": "vessel", "vi": "tàu", "cn": "船", "py": "chuán", "ipa": "/ˈvɛsl/", "pos": "danh từ"}], "sentences": [{"v": "Lô hàng sẽ đến vào tuần tới.", "e": "The shipment will arrive next week.", "f": "/ðə ˈʃɪpmənt wɪl əˈraɪv nɛkst wiːk/", "c": "货物将于下周送达。", "y": "Huòwù jiāng yú xiàzhōu sòngdá.", "vocab": [{"en": "week", "cn": "周", "py": "zhōu", "vi": "tuần", "ipa": "/wiːk/", "pos": "danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Lô hàng bị chậm do thời tiết xấu.", "e": "The shipment is delayed due to bad weather.", "f": "/ðə ˈʃɪpmənt ɪz dɪˈleɪd djuː tuː bæd ˈwɛðə/", "c": "货物因恶劣天气延误。", "y": "Huòwù yīn èliè tiānqì yánwù.", "vocab": [{"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "bad weather", "cn": "恶劣天气", "py": "èliè tiānqì", "vi": "thời tiết xấu", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}], "gram": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}]}, {"v": "Chúng tôi cần kiểm tra tình trạng vận chuyển của lô hàng này.", "e": "We need to check the shipping status of this shipment.", "f": "/wiː niːd tuː tʃɛk ðə ˈʃɪpɪŋ ˈsteɪtəs ɒv ðɪs ˈʃɪpmənt/", "c": "我们需要检查这批货物的运输状态。", "y": "Wǒmen xūyào jiǎnchá zhè pī huòwù de yùnshū zhuàngtài.", "vocab": [{"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "shipping", "cn": "运输", "py": "yùnshū", "vi": "vận chuyển", "ipa": "/ˈʃɪpɪŋ/", "pos": "danh từ"}, {"en": "status", "cn": "状态", "py": "zhuàngtài", "vi": "tình trạng", "ipa": "/ˈsteɪtəs/", "pos": "danh từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Khách hàng muốn thay đổi địa chỉ giao hàng.", "e": "The customer wants to change the delivery address.", "f": "/ðə ˈkʌstəmə wɒnts tuː tʃeɪnʤ ðə dɪˈlɪvəri əˈdrɛs/", "c": "客户想要更改送货地址。", "y": "Kèhù xiǎngyào gēnggǎi sònghuò dìzhǐ.", "vocab": [{"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "delivery address", "cn": "送货地址", "py": "sònghuò dìzhǐ", "vi": "địa chỉ giao hàng", "ipa": "/dɪˈlɪvəri əˈdrɛs/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Container đã đến cảng vào sáng nay.", "e": "The container arrived at the port this morning.", "f": "/ðə kənˈteɪnər əˈraɪvd æt ðə pɔːt ðɪs ˈmɔːnɪŋ/", "c": "集装箱今天早上到达港口。", "y": "Jízhuāngxiāng jīntiān zǎoshàng dàodá gǎngkǒu.", "vocab": [{"en": "container", "cn": "集装箱", "py": "jízhuāngxiāng", "vi": "container", "ipa": "/kənˈteɪnə/", "pos": "danh từ"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi đang theo dõi tiến độ giao hàng mỗi ngày.", "e": "We are tracking the delivery progress every day.", "f": "/wiː ɑː ˈtrækɪŋ ðə dɪˈlɪvəri ˈprəʊɡrəs ˈɛvri deɪ/", "c": "我们每天都在跟踪送货进度。", "y": "Wǒmen měitiān dōu zài gēnzōng sònghuò jìndù.", "vocab": [{"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}, {"en": "progress", "cn": "进度", "py": "jìndù", "vi": "tiến độ", "ipa": "/ˈprəʊɡrɛs/", "pos": "danh từ"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"v": "Bạn có thể cập nhật lịch trình vận chuyển cho tôi được không?", "e": "Could you please update the shipping schedule for me?", "f": "/kʊd juː pliːz ʌpˈdeɪt ðɪ ˈʃɪpɪŋ ˈʃɛdjuːl fɔː miː/", "c": "你能帮我更新船期表吗？", "y": "Nǐ néng bāng wǒ gēngxīn chuánqī biǎo ma?", "vocab": [{"en": "shipping schedule", "cn": "船期", "py": "chuánqī", "vi": "lịch tàu", "ipa": "/ˈʃɪpɪŋ ˈʃɛdjuːl/", "pos": "cụm danh từ"}], "gram": [{"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}, {"v": "Tôi sẽ liên hệ với forwarder để kiểm tra thông tin.", "e": "I will contact the forwarder to check the information.", "f": "/aɪ wɪl ˈkɒntækt ðə ˈfɔːwədə tuː tʃɛk ðɪ ˌɪnfəˈmeɪʃən/", "c": "我将联系货代核实信息。", "y": "Wǒ jiāng liánxì huòdài héshí xìnxī.", "vocab": [{"en": "contact", "cn": "联系", "py": "liánxì", "vi": "liên hệ", "ipa": "/ˈkɒntækt/", "pos": "động từ"}, {"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Chúng tôi muốn cập nhật tình trạng của lô hàng.", "e": "We would like to update the status of the shipment.", "f": "/wiː wʊd laɪk tuː ʌpˈdeɪt ðə ˈsteɪtəs ɒv ðə ˈʃɪpmənt/", "c": "我们想更新这批货物的状态。", "y": "Wǒmen xiǎng gēngxīn zhè pī huòwù de zhuàngtài.", "vocab": [{"en": "status", "cn": "状态", "py": "zhuàngtài", "vi": "tình trạng", "ipa": "/ˈsteɪtəs/", "pos": "danh từ"}], "gram": [{"en": "would like to + V", "cn": "想 + V", "note": "Muốn làm gì (lịch sự)."}]}, {"v": "Hiện tại lô hàng vẫn đang được vận chuyển.", "e": "Currently, the shipment is still in transit.", "f": "/ˈkʌrəntli, ðə ˈʃɪpmənt ɪz stɪl ɪn ˈtrænsɪt/", "c": "目前，该批货物仍在运输中。", "y": "Mùqián, gāi pī huòwù réng zài yùnshū zhōng.", "vocab": [{"en": "in transit", "cn": "仍在运输中", "py": "réng zài yùnshū zhōng", "vi": "đang vận chuyển", "ipa": "/ɪn ˈtrænzɪt/", "pos": "cụm trạng từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Lô hàng đã đến cảng đích.", "e": "The shipment has arrived at the port of destination.", "f": "/ðə ˈʃɪpmənt hæz əˈraɪvd æt ðə pɔːt ɒv ˌdɛstɪˈneɪʃən/", "c": "货物已到达目的港。", "y": "Huòwù yǐ dàodá mùdì gǎng.", "vocab": [{"en": "port of destination", "cn": "目的港", "py": "mùdì gǎng", "vi": "cảng đích", "ipa": "/pɔːt ɒv ˌdɛstɪˈneɪʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Hàng đã đến cảng Đình Vũ rồi.", "e": "The goods have arrived at Dinh Vu Port.", "f": "/ðə ɡʊdz hæv əˈraɪvd æt dɪŋ vuː pɔːt/", "c": "货物已抵达 Đình Vũ 港。", "y": "Huòwù yǐ dǐdá Đình Vũ Gǎng.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Tàu sẽ cập cảng Đình Vũ vào ngày 2/9.", "e": "The ship will berth at Dinh Vu Port on September 2nd.", "f": "/ðə ʃɪp wɪl bɜːθ æt dɪŋ vuː pɔːt ɒn sɛpˈtɛmbə ðə sɛkənd/", "c": "船将于9月2日靠泊 Đình Vũ 港。", "y": "Chuán jiāng yú jiǔ yuè èr rì kàobó Đình Vũ Gǎng.", "vocab": [{"en": "berth", "cn": "靠泊", "py": "kàobó", "vi": "cập cảng", "ipa": "/bɜːθ/", "pos": "động từ"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Tàu bị chậm.", "e": "The ship is delayed.", "f": "/ðə ʃɪp ɪz dɪˈleɪd/", "c": "船只延误了。", "y": "Chuánzhī yánwù le.", "vocab": [{"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Để đảm bảo lộ trình được giao đúng hạn, chúng tôi sẽ theo dõi tiến độ vận chuyển hằng ngày và cập nhật cho bạn nếu có bất kỳ thay đổi nào.", "e": "To ensure on-time delivery, we will monitor the transit progress daily and update you of any changes.", "f": "/tuː ɪnˈʃʊər ɒn-taɪm dɪˈlɪvəri, wiː wɪl ˈmɒnɪtə ðə ˈtrænsɪt ˈprəʊɡrəs ˈdeɪli ænd ʌpˈdeɪt juː ɒv ˈɛni ˈtʃeɪnʤɪz/", "c": "为确保按时送达，我们将每日跟踪运输进度，如有变动将及时通知您。", "y": "Wèi quèbǎo ànshí sòngdá, wǒmen jiāng měirì gēnzōng yùnshū jìndù, rúyǒu biàndòng jiāng jíshí tōngzhī nín.", "vocab": [{"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}, {"en": "monitor", "cn": "跟踪", "py": "gēnzōng", "vi": "theo dõi", "ipa": "/ˈmɒnɪtə/", "pos": "động từ"}, {"en": "progress", "cn": "进度", "py": "jìndù", "vi": "tiến độ", "ipa": "/ˈprəʊɡrɛs/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Khách hàng muốn biết khi nào container sẽ đến cảng để họ sắp xếp nhân viên đi lấy hàng.", "e": "The customer wants to know when the container will arrive at the port so they can arrange staff to pick up the cargo.", "f": "/ðə ˈkʌstəmə wɒnts tuː nəʊ wɛn ðə kənˈteɪnər wɪl əˈraɪv æt ðə pɔːt səʊ ðeɪ kæn əˈreɪnʤ stɑːf tuː pɪk ʌp ðə ˈkɑːɡəʊ/", "c": "客户想知道集装箱何时到港，以便安排人员提货。", "y": "Kèhù xiǎng zhīdào jízhuāngxiāng héshí dào gǎng, yǐbiàn ānpái rényuán tíhuò.", "vocab": [{"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "container", "cn": "集装箱", "py": "jízhuāngxiāng", "vi": "container", "ipa": "/kənˈteɪnə/", "pos": "danh từ"}, {"en": "cargo", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Hãng vận chuyển khuyến nghị chúng tôi cập nhật địa chỉ giao hàng hôm nay để tránh giao nhầm và giao chậm.", "e": "The carrier recommends we update the delivery address today to avoid misdelivery and shipping delays.", "f": "/ðə ˈkæriə ˌrɛkəˈmɛndz wiː ʌpˈdeɪt ðə dɪˈlɪvəri əˈdrɛs təˈdeɪ tuː əˈvɔɪd ˌmɪsdɪˈlɪvəri ænd ˈʃɪpɪŋ dɪˈleɪz/", "c": "承运人建议我们今天更新送货地址，以防错投和延误。", "y": "Chéngyùnrén jiànyì wǒmen jīntiān gēngxīn sònghuò dìzhǐ, yǐfáng cuòtóu hé yánwù.", "vocab": [{"en": "delivery address", "cn": "送货地址", "py": "sònghuò dìzhǐ", "vi": "địa chỉ giao hàng", "ipa": "/dɪˈlɪvəri əˈdrɛs/", "pos": "cụm danh từ"}, {"en": "misdelivery", "cn": "错投", "py": "cuòtóu", "vi": "giao nhầm", "ipa": "/ˌmɪsdɪˈlɪvəri/", "pos": "danh từ"}, {"en": "shipping", "cn": "运输", "py": "yùnshū", "vi": "vận chuyển", "ipa": "/ˈʃɪpɪŋ/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Mỗi buổi sáng, tôi thường kiểm tra lịch tàu để cập nhật thời gian khởi hành và thời gian dự kiến tới cảng.", "e": "Every morning, I check the vessel schedule to update the departure and estimated time of arrival (ETA).", "f": "/ˈɛvri ˈmɔːnɪŋ, aɪ tʃɛk ðə ˈvɛsl ˈʃɛdjuːl tuː ʌpˈdeɪt ðə dɪˈpɑːtʃər ænd ˈɛstɪmeɪtɪd taɪm ɒv əˈraɪvəl/", "c": "每天早晨，我都会检查船期表，以更新离港时间和预计到港时间（ETA）。", "y": "Měitiān zǎochén, wǒ dōu huì jiǎnchá chuánqī biǎo, yǐ gēngxīn lígǎng shíjiān hé yùjì dào gǎng shíjiān (ETA).", "vocab": [{"en": "schedule", "cn": "计划", "py": "jìhuà", "vi": "lịch/kế hoạch", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "departure", "cn": "离港时间", "py": "lígǎng shíjiān", "vi": "thời gian khởi hành", "ipa": "/dɪˈpɑːtʃə/", "pos": "danh từ"}, {"en": "estimated time of arrival", "cn": "预计到港时间", "py": "yùjì dào gǎng shíjiān", "vi": "thời gian dự kiến đến (ETA)", "ipa": "/ˈɛstɪmeɪtɪd taɪm ɒv əˈraɪvəl/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Theo lịch trình hiện tại, tàu dự kiến sẽ đến cảng vào sáng thứ 2 tuần tới.", "e": "According to the current schedule, the vessel is expected to arrive at the port next Monday morning.", "f": "/əˈkɔːdɪŋ tuː ðə ˈkʌrənt ˈʃɛdjuːl, ðə ˈvɛsl ɪz ɪksˈpɛktɪd tuː əˈraɪv æt ðə pɔːt nɛkst ˈmʌndeɪ ˈmɔːnɪŋ/", "c": "根据目前的船期，该船预计将于下周一早上抵达港口。", "y": "Gēnjù mùqián de chuánqī, gāi chuán yùjì jiāng yú xià zhōu yī zǎoshàng dǐdá gǎngkǒu.", "vocab": [{"en": "schedule", "cn": "计划", "py": "jìhuà", "vi": "lịch/kế hoạch", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "vessel", "cn": "船", "py": "chuán", "vi": "tàu", "ipa": "/ˈvɛsl/", "pos": "danh từ"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}], "gramCore": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}, {"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}, {"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}, {"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}, {"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}, {"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}, {"en": "would like to + V", "cn": "想 + V", "note": "Muốn làm gì (lịch sự)."}, {"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"id": 5, "vi": "Thủ tục Hải quan & Cảng", "en": "Customs & Port Operations", "context": "Các mẫu câu thực tế tại cảng và chi cục Hải quan: thông quan hàng hóa, giải quyết sự cố hàng bị giữ (hold), chuẩn bị hồ sơ bổ sung và theo dõi quá trình hạ bãi, dỡ container.", "vocab": [{"en": "goods", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "held at customs", "vi": "bị giữ ở hải quan", "cn": "被海关扣留", "py": "bèi hǎiguān kòuliú", "ipa": "/hɛld æt ˈkʌstəmz/", "pos": "cụm tính từ"}, {"en": "customs procedures", "vi": "thủ tục hải quan", "cn": "海关手续", "py": "hǎiguān shǒuxù", "ipa": "/ˈkʌstəmz prəˈsiːdʒəz/", "pos": "cụm danh từ"}, {"en": "customs declaration", "vi": "hồ sơ khai báo hải quan", "cn": "报关文件", "py": "bàoguān wénjiàn", "ipa": "/ˈkʌstəmz ˌdɛkləˈreɪʃən/", "pos": "cụm danh từ"}, {"en": "cleared customs", "vi": "đã thông quan", "cn": "清关", "py": "qīngguān", "ipa": "/klɪəd ˈkʌstəmz/", "pos": "cụm động từ"}, {"en": "customs clearance", "vi": "thông quan", "cn": "通关", "py": "tōngguān", "ipa": "/ˈkʌstəmz ˈklɪərəns/", "pos": "cụm danh từ"}, {"en": "port", "vi": "cảng", "cn": "港口", "py": "gǎngkǒu", "ipa": "/pɔːt/", "pos": "danh từ"}, {"en": "check", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "container", "vi": "container", "cn": "集装箱", "py": "jízhuāngxiāng", "ipa": "/kənˈteɪnə/", "pos": "danh từ"}, {"en": "additional documents", "vi": "giấy tờ bổ sung", "cn": "补充文件", "py": "bǔchōng wénjiàn", "ipa": "/əˈdɪʃənl ˈdɒkjʊmənts/", "pos": "cụm danh từ"}, {"en": "unloaded", "vi": "dỡ hàng", "cn": "卸货", "py": "xièhuò", "ipa": "/ʌnˈləʊdɪd/", "pos": "động từ"}, {"en": "clear", "vi": "thông quan", "cn": "通关", "py": "tōngguān", "ipa": "/klɪə/", "pos": "động từ"}, {"en": "warehouse", "vi": "kho", "cn": "仓库", "py": "cāngkù", "ipa": "/ˈwɛəhaʊs/", "pos": "danh từ"}, {"en": "checking", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/ˈtʃɛkɪŋ/", "pos": "động từ (V-ing)"}, {"en": "stock quantity", "vi": "số lượng hàng tồn", "cn": "库存量", "py": "kùcún liàng", "ipa": "/stɒk ˈkwɒntɪti/", "pos": "cụm danh từ"}, {"en": "product", "vi": "sản phẩm", "cn": "产品", "py": "chǎnpǐn", "ipa": "/ˈprɒdʌkt/", "pos": "danh từ"}, {"en": "provide", "vi": "cung cấp", "cn": "提供", "py": "tígōng", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "pickup", "vi": "lấy hàng", "cn": "提货", "py": "tíhuò", "ipa": "/ˈpɪkʌp/", "pos": "danh từ"}, {"en": "address", "vi": "địa chỉ", "cn": "地址", "py": "dìzhǐ", "ipa": "/əˈdrɛs/", "pos": "danh từ"}, {"en": "consignee", "vi": "người nhận hàng", "cn": "收货人", "py": "shōuhuòrén", "ipa": "/ˌkɒnsaɪˈniː/", "pos": "danh từ"}, {"en": "confirm", "vi": "xác nhận", "cn": "确认", "py": "quèrèn", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "seal number", "vi": "số seal", "cn": "封条号", "py": "fēngtiáo hào", "ipa": "/siːl ˈnʌmbə/", "pos": "cụm danh từ"}, {"en": "packages", "vi": "kiện hàng", "cn": "件数", "py": "jiànshù", "ipa": "/ˈpækɪdʒɪz/", "pos": "danh từ (số nhiều)"}, {"en": "weight", "vi": "trọng lượng", "cn": "重量", "py": "zhòngliàng", "ipa": "/weɪt/", "pos": "danh từ"}, {"en": "port of destination", "vi": "cảng đích", "cn": "目的港", "py": "mùdì gǎng", "ipa": "/pɔːt ɒv ˌdɛstɪˈneɪʃən/", "pos": "cụm danh từ"}], "sentences": [{"v": "Xin lỗi nhé, hàng đang bị giữ ở hải quan mất rồi.", "e": "I am sorry, but the goods are currently held at customs.", "f": "/aɪ æm ˈsɒri, bʌt ðə ɡʊdz ɑː ˈkʌrəntli hɛld æt ˈkʌstəmz/", "c": "很抱歉，货物目前被海关扣留了。", "y": "Hěn bàoqiàn, huòwù mùqián bèi hǎiguān kòuliú le.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "held at customs", "cn": "被海关扣留", "py": "bèi hǎiguān kòuliú", "vi": "bị giữ ở hải quan", "ipa": "/hɛld æt ˈkʌstəmz/", "pos": "cụm tính từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi đang phải đối mặt với một số vấn đề liên quan đến thủ tục hải quan.", "e": "We are facing some issues related to customs procedures.", "f": "/wiː ɑː ˈfeɪsɪŋ sʌm ˈɪʃuːz rɪˈleɪtɪd tuː ˈkʌstəmz prəˈsiːʤəz/", "c": "我们正面临一些与海关手续相关的问题。", "y": "Wǒmen zhèng miànlín yīxiē yǔ hǎiguān shǒuxù xiāngguān de wèntí.", "vocab": [{"en": "customs procedures", "cn": "海关手续", "py": "hǎiguān shǒuxù", "vi": "thủ tục hải quan", "ipa": "/ˈkʌstəmz prəˈsiːdʒəz/", "pos": "cụm danh từ"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"v": "Bộ phận chứng từ đang chuẩn bị hồ sơ khai báo hải quan.", "e": "The documentation department is preparing the customs declaration files.", "f": "/ðə ˌdɒkjʊmɛnˈteɪʃən dɪˈpɑːtmənt ɪz prɪˈpeərɪŋ ðə ˈkʌstəmz ˌdɛkləˈreɪʃən faɪlz/", "c": "单证部门正在准备报关文件。", "y": "Dānzhèng bùmén zhèngzài zhǔnbèi bàoguān wénjiàn.", "vocab": [{"en": "customs declaration", "cn": "报关文件", "py": "bàoguān wénjiàn", "vi": "hồ sơ khai báo hải quan", "ipa": "/ˈkʌstəmz ˌdɛkləˈreɪʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Lô hàng đã hoàn tất thủ tục hải quan.", "e": "The shipment has cleared customs.", "f": "/ðə ˈʃɪpmənt hæz klɪəd ˈkʌstəmz/", "c": "货物已完成清关。", "y": "Huòwù yǐ wánchéng qīngguān.", "vocab": [{"en": "cleared customs", "cn": "清关", "py": "qīngguān", "vi": "đã thông quan", "ipa": "/klɪəd ˈkʌstəmz/", "pos": "cụm động từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Hàng đang chờ thông quan tại cảng.", "e": "The goods are waiting for customs clearance at the port.", "f": "/ðə ɡʊdz ɑː ˈweɪtɪŋ fɔː ˈkʌstəmz ˈklɪərəns æt ðə pɔːt/", "c": "货物正在港口等待通关。", "y": "Huòwù zhèngzài gǎngkǒu děngdài tōngguān.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "customs clearance", "cn": "通关", "py": "tōngguān", "vi": "thông quan", "ipa": "/ˈkʌstəmz ˈklɪərəns/", "pos": "cụm danh từ"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"v": "Bạn có thể kiểm tra xem container đã được thông quan chưa?", "e": "Can you check if the container has cleared customs?", "f": "/kæn juː tʃɛk ɪf ðə kənˈteɪnər hæz klɪəd ˈkʌstəmz/", "c": "你能检查一下集装箱通关了吗？", "y": "Nǐ néng jiǎnchá yīxià jízhuāngxiāng tōngguān le ma?", "vocab": [{"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "container", "cn": "集装箱", "py": "jízhuāngxiāng", "vi": "container", "ipa": "/kənˈteɪnə/", "pos": "danh từ"}, {"en": "cleared customs", "cn": "清关", "py": "qīngguān", "vi": "đã thông quan", "ipa": "/klɪəd ˈkʌstəmz/", "pos": "cụm động từ"}], "gram": [{"en": "Can + S + V...?", "cn": "你能 + V + 吗？", "note": "Có thể... không?"}]}, {"v": "Hải quan yêu cầu bổ sung một số giấy tờ.", "e": "Customs requires some additional documents.", "f": "/ˈkʌstəmz rɪˈkwaɪəz sʌm əˈdɪʃənl ˈdɒkjʊmənts/", "c": "海关要求补充一些文件。", "y": "Hǎiguān yāoqiú bǔchōng yīxiē wénjiàn.", "vocab": [{"en": "additional documents", "cn": "补充文件", "py": "bǔchōng wénjiàn", "vi": "giấy tờ bổ sung", "ipa": "/əˈdɪʃənl ˈdɒkjʊmənts/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Container đang được dỡ tại cảng Đình Vũ.", "e": "The container is being unloaded at Dinh Vu Port.", "f": "/ðə kənˈteɪnər ɪz ˈbiːɪŋ ʌnˈləʊdɪd æt dɪŋ vuː pɔːt/", "c": "集装箱正在 Đình Vũ 港卸货。", "y": "Jízhuāngxiāng zhèngzài Đình Vũ Gǎng xièhuò.", "vocab": [{"en": "container", "cn": "集装箱", "py": "jízhuāngxiāng", "vi": "container", "ipa": "/kənˈteɪnə/", "pos": "danh từ"}, {"en": "unloaded", "cn": "卸货", "py": "xièhuò", "vi": "dỡ hàng", "ipa": "/ʌnˈləʊdɪd/", "pos": "động từ"}, {"en": "port", "cn": "港口", "py": "gǎngkǒu", "vi": "cảng", "ipa": "/pɔːt/", "pos": "danh từ"}], "gram": [{"en": "is/are + being + V3", "cn": "正在被 + V", "note": "Bị động, đang diễn ra."}]}, {"v": "Chúng tôi đã gửi tất cả chứng từ cần thiết cho hải quan và bây giờ chỉ còn chờ lô hàng được thông quan nữa thôi.", "e": "We have sent all the necessary documents to customs, and now we are just waiting for the shipment to clear.", "f": "/wiː hæv send ɔːl ðə ˈnɛsɪsəri ˈdɒkjʊmənts tuː ˈkʌstəmz, ænd naʊ wiː ɑː ʤʌst ˈweɪtɪŋ fɔː ðə ˈʃɪpmənt tuː klɪə/", "c": "我们已向海关发送了所有必要单据，现在只需等待货物通关。", "y": "Wǒmen yǐ xiàng hǎiguān fāsòng le suǒyǒu bìyào dānjù, xiànzài zhǐ xū děngdài huòwù tōngguān.", "vocab": [{"en": "clear", "cn": "通关", "py": "tōngguān", "vi": "thông quan", "ipa": "/klɪə/", "pos": "động từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Bộ phận kho đang kiểm tra số lượng hàng tồn.", "e": "The warehouse department is checking the stock quantity.", "f": "/ðə ˈweəhaʊs dɪˈpɑːtmənt ɪz ˈtʃɛkɪŋ ðə stɒk ˈkwɒntɪti/", "c": "仓库部门正在检查库存量。", "y": "Cāngkù bùmén zhèngzài jiǎnchá kùcún liàng.", "vocab": [{"en": "warehouse", "cn": "仓库", "py": "cāngkù", "vi": "kho", "ipa": "/ˈwɛəhaʊs/", "pos": "danh từ"}, {"en": "checking", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/ˈtʃɛkɪŋ/", "pos": "động từ (V-ing)"}, {"en": "stock quantity", "cn": "库存量", "py": "kùcún liàng", "vi": "số lượng hàng tồn", "ipa": "/stɒk ˈkwɒntɪti/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Sau khi hàng được giao đến kho, vui lòng kiểm tra số lượng và tình trạng sản phẩm rồi thông báo cho chúng tôi nếu có bất kỳ vấn đề nào.", "e": "Once the goods are delivered to the warehouse, please check the quantity and product condition and notify us of any issues.", "f": "/wʌns ðə ɡʊdz ɑː dɪˈlɪvəd tuː ðə ˈweəhaʊs, pliːz tʃɛk ðə ˈkwɒntɪti ænd ˈprɒdʌkt kənˈdɪʃən ænd ˈnəʊtɪfaɪ ʌs ɒv ˈɛni ˈɪʃuːz/", "c": "货物送达仓库后，请检查数量和产品状况，如有任何问题请通知我们。", "y": "Huòwù sòngdá cāngkù hòu, qǐng jiǎnchá shùliàng hé chǎnpǐn zhuàngtài, rúyǒu rènhé wèntí qǐng tōngzhī wǒmen.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "warehouse", "cn": "仓库", "py": "cāngkù", "vi": "kho", "ipa": "/ˈwɛəhaʊs/", "pos": "danh từ"}, {"en": "product", "cn": "产品", "py": "chǎnpǐn", "vi": "sản phẩm", "ipa": "/ˈprɒdʌkt/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Bạn có thể cho biết địa chỉ lấy hàng được không?", "e": "Could you please provide the pickup address?", "f": "/kʊd juː pliːz prəˈvaɪd ðə ˈpɪkʌp əˈdrɛs/", "c": "你能提供提货地址吗？", "y": "Nǐ néng tígōng tíhuò dìzhǐ ma?", "vocab": [{"en": "provide", "cn": "提供", "py": "tígōng", "vi": "cung cấp", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "pickup", "cn": "提货", "py": "tíhuò", "vi": "lấy hàng", "ipa": "/ˈpɪkʌp/", "pos": "danh từ"}, {"en": "address", "cn": "地址", "py": "dìzhǐ", "vi": "địa chỉ", "ipa": "/əˈdrɛs/", "pos": "danh từ"}], "gram": [{"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}]}, {"v": "Ai là người nhận hàng?", "e": "Who is the consignee?", "f": "/huː ɪz ðə ˌkɒnsaɪˈniː/", "c": "谁是收货人？", "y": "Shéi shì shōuhuòrén?", "vocab": [{"en": "consignee", "cn": "收货人", "py": "shōuhuòrén", "vi": "người nhận hàng", "ipa": "/ˌkɒnsaɪˈniː/", "pos": "danh từ"}], "gram": [{"en": "Who + be + S?", "cn": "谁 + 是 + S？", "note": "Hỏi về người."}]}, {"v": "Xin vui lòng xác nhận số seal.", "e": "Please confirm the seal number.", "f": "/pliːz kənˈfɜːm ðə siːl ˈnʌmbə/", "c": "请确认封条号（Seal Number）。", "y": "Qǐng quèrèn fēngtiáo hào.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "seal number", "cn": "封条号", "py": "fēngtiáo hào", "vi": "số seal", "ipa": "/siːl ˈnʌmbə/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Xin vui lòng xác nhận lại số lượng kiện hàng.", "e": "Please reconfirm the number of packages.", "f": "/pliːz riːkənˈfɜːm ðə ˈnʌmbər ɒv ˈpækɪʤɪz/", "c": "请重新确认件数。", "y": "Qǐng chóngxīn quèrèn jiànshù.", "vocab": [{"en": "packages", "cn": "件数", "py": "jiànshù", "vi": "kiện hàng", "ipa": "/ˈpækɪdʒɪz/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Xin vui lòng xác nhận lại trọng lượng.", "e": "Please reconfirm the weight.", "f": "/pliːz riːkənˈfɜːm ðə weɪt/", "c": "请重新确认重量。", "y": "Qǐng chóngxīn quèrèn zhòngliàng.", "vocab": [{"en": "weight", "cn": "重量", "py": "zhòngliàng", "vi": "trọng lượng", "ipa": "/weɪt/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Lô hàng vừa đến cảng đích xong.", "e": "The shipment has just arrived at the port of destination.", "f": "/ðə ˈʃɪpmənt hæz ʤʌst əˈraɪvd æt ðə pɔːt ɒv ˌdɛstɪˈneɪʃən/", "c": "货物刚刚抵达目的港。", "y": "Huòwù gānggāng dǐdá mùdì gǎng.", "vocab": [{"en": "port of destination", "cn": "目的港", "py": "mùdì gǎng", "vi": "cảng đích", "ipa": "/pɔːt ɒv ˌdɛstɪˈneɪʃən/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Hàng đang được giao đến địa chỉ của anh chị.", "e": "The goods are being delivered to your address.", "f": "/ðə ɡʊdz ɑː ˈbiːɪŋ dɪˈlɪvəd tuː jɔːr əˈdrɛs/", "c": "货物正在送往您的地址。", "y": "Huòwù zhèngzài sòng wǎng nín de dìzhǐ.", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "address", "cn": "地址", "py": "dìzhǐ", "vi": "địa chỉ", "ipa": "/əˈdrɛs/", "pos": "danh từ"}], "gram": [{"en": "is/are + being + V3", "cn": "正在被 + V", "note": "Bị động, đang diễn ra."}]}, {"v": "Anh chị đã nhận hàng chưa?", "e": "Have you received the goods yet?", "f": "/hæv juː rɪˈsiːvd ðə ɡʊdz jɛt/", "c": "您收到货了吗？", "y": "Nín shōudào huò le ma?", "vocab": [{"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "Is/Have + S + V3?", "cn": "S + V + 了 + 吗？", "note": "Hỏi về kết quả một việc đã/đang xảy ra."}]}, {"v": "Vui lòng xác nhận khi hàng được giao thành công.", "e": "Please confirm once the goods are successfully delivered.", "f": "/pliːz kənˈfɜːm wʌns ðə ɡʊdz ɑː səkˈsɛsfʊli dɪˈlɪvəd/", "c": "货物成功送达后请予以确认。", "y": "Huòwù chénggōng sòngdá hòu qǐng yǔyǐ quèrèn.", "vocab": [{"en": "confirm", "cn": "确认", "py": "quèrèn", "vi": "xác nhận", "ipa": "/kənˈfɜːm/", "pos": "động từ"}, {"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}], "gramCore": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}, {"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}, {"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}, {"en": "Can + S + V...?", "cn": "你能 + V + 吗？", "note": "Có thể... không?"}, {"en": "is/are + being + V3", "cn": "正在被 + V", "note": "Bị động, đang diễn ra."}, {"en": "Could you please + V...?", "cn": "S + 能 + V + O + 吗？", "note": "Đề nghị rất lịch sự: Bạn có thể vui lòng... không?"}, {"en": "Who + be + S?", "cn": "谁 + 是 + S？", "note": "Hỏi về người."}, {"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}, {"en": "Is/Have + S + V3?", "cn": "S + V + 了 + 吗？", "note": "Hỏi về kết quả một việc đã/đang xảy ra."}]}, {"id": 6, "vi": "Xử lý Sự cố & Chậm trễ", "en": "Troubleshooting & Delays", "context": "Trang bị cách ứng phó chuyên nghiệp: thông báo hàng trễ do thời tiết xấu, khiếu nại hàng bị hư hỏng, móp méo và đàm phán phương án bồi thường, gửi hàng thay thế.", "vocab": [{"en": "cargo", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "delayed", "vi": "chậm trễ", "cn": "延误", "py": "yánwù", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "bad weather", "vi": "thời tiết xấu", "cn": "恶劣天气", "py": "èliè tiānqì", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}, {"en": "shipping line", "vi": "hãng tàu", "cn": "船公司", "py": "chuán gōngsī", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}, {"en": "schedule change", "vi": "thay đổi lịch trình", "cn": "行程变更", "py": "xíngchéng biàngēng", "ipa": "/ˈʃɛdjuːl tʃeɪndʒ/", "pos": "cụm danh từ"}, {"en": "vessel", "vi": "tàu", "cn": "船", "py": "chuán", "ipa": "/ˈvɛsl/", "pos": "danh từ"}, {"en": "contact", "vi": "liên hệ", "cn": "联系", "py": "liánxì", "ipa": "/ˈkɒntækt/", "pos": "động từ"}, {"en": "check", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/tʃɛk/", "pos": "động từ"}, {"en": "schedule", "vi": "lịch/kế hoạch", "cn": "计划", "py": "jìhuà", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}, {"en": "documents", "vi": "đấy.", "cn": "据。", "py": "dānjù", "ipa": "/ˈdɒkjʊmənt/", "pos": "danh từ"}, {"en": "order", "vi": "đơn hàng", "cn": "订单", "py": "dìngdān", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "send", "vi": "gửi", "cn": "发送", "py": "fāsòng", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "replacements", "vi": "hàng thay thế", "cn": "替代品", "py": "tìdàipǐn", "ipa": "/rɪˈpleɪsmənts/", "pos": "danh từ (số nhiều)"}, {"en": "delivery", "vi": "giao hàng", "cn": "交货", "py": "jiāohuò", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}, {"en": "damaged products", "vi": "sản phẩm hư hỏng", "cn": "受损产品", "py": "shòusǔn chǎnpǐn", "ipa": "/ˈdæmɪdʒd ˈprɒdʌkts/", "pos": "cụm danh từ"}, {"en": "checking", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/ˈtʃɛkɪŋ/", "pos": "động từ (V-ing)"}, {"en": "goods", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "dented cartons", "vi": "thùng bị móp", "cn": "变形的箱子", "py": "biànxíng de xiāngzi", "ipa": "/ˈdɛntɪd ˈkɑːtənz/", "pos": "cụm danh từ"}, {"en": "provide", "vi": "cung cấp", "cn": "提供", "py": "tígōng", "ipa": "/prəˈvaɪd/", "pos": "động từ"}, {"en": "minor error", "vi": "lỗi nhỏ", "cn": "小错误", "py": "xiǎo cuòwù", "ipa": "/ˈmaɪnər ˈɛrə/", "pos": "cụm danh từ"}, {"en": "consignee", "vi": "người nhận hàng", "cn": "收货人", "py": "shōuhuòrén", "ipa": "/ˌkɒnsaɪˈniː/", "pos": "danh từ"}, {"en": "document", "vi": "chứng từ", "cn": "单据", "py": "dānjù", "ipa": "/ˈdɒkjʊmənt/", "pos": "danh từ"}, {"en": "commercial invoice", "vi": "hóa đơn thương mại", "cn": "商业发票", "py": "shāngyè fāpiào", "ipa": "/kəˈmɜːʃəl ˈɪnvɔɪs/", "pos": "cụm danh từ"}, {"en": "packing list", "vi": "phiếu đóng gói", "cn": "装箱单", "py": "zhuāngxiāngdān", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}, {"en": "extra costs", "vi": "chi phí phụ", "cn": "额外费用", "py": "éwài fèiyòng", "ipa": "/ˈɛkstrə kɒsts/", "pos": "cụm danh từ"}], "sentences": [{"v": "Hàng bị trễ do thời tiết xấu.", "e": "The cargo is delayed due to bad weather.", "f": "/ðə ˈkɑːɡəʊ ɪz dɪˈleɪd djuː tuː bæd ˈwɛðə/", "c": "货物因恶劣天气延误。", "y": "Huòwù yīn èliè tiānqì yánwù.", "vocab": [{"en": "cargo", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ˈkɑːɡəʊ/", "pos": "danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "bad weather", "cn": "恶劣天气", "py": "èliè tiānqì", "vi": "thời tiết xấu", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}], "gram": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}]}, {"v": "Lô hàng bị chậm do thời tiết xấu.", "e": "The shipment is delayed due to bad weather.", "f": "/ðə ˈʃɪpmənt ɪz dɪˈleɪd djuː tuː bæd ˈwɛðə/", "c": "该批货物因恶劣天气延误。", "y": "Gāi pī huòwù yīn èliè tiānqì yánwù.", "vocab": [{"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "bad weather", "cn": "恶劣天气", "py": "èliè tiānqì", "vi": "thời tiết xấu", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}], "gram": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}]}, {"v": "Hãng tàu vừa thông báo thay đổi lịch trình.", "e": "The shipping line has just announced a schedule change.", "f": "/ðə ˈʃɪpɪŋ laɪn hæz ʤʌst əˈnaʊnst ə ˈʃɛdjuːl tʃeɪnʤ/", "c": "船公司刚刚通知行程变更。", "y": "Chuán gōngsī gānggāng tōngzhī xíngchéng biàngēng.", "vocab": [{"en": "shipping line", "cn": "船公司", "py": "chuán gōngsī", "vi": "hãng tàu", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}, {"en": "schedule change", "cn": "行程变更", "py": "xíngchéng biàngēng", "vi": "thay đổi lịch trình", "ipa": "/ˈʃɛdjuːl tʃeɪndʒ/", "pos": "cụm danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Tuy nhiên, chuyến tàu này có thể bị chậm do điều kiện thời tiết không thuận lợi.", "e": "However, this vessel may be delayed due to unfavorable weather conditions.", "f": "/haʊˈɛvə, ðɪs ˈvɛsl meɪ biː dɪˈleɪd djuː tuː ʌnˈfeɪvərəbl ˈwɛðə kənˈdɪʃənz/", "c": "然而，由于天气条件不利，该船可能会延误。", "y": "Rán'ér, yóuyú tiānqì tiáojiàn bùlì, gāi chuán kěnéng huì yánwù.", "vocab": [{"en": "vessel", "cn": "船", "py": "chuán", "vi": "tàu", "ipa": "/ˈvɛsl/", "pos": "danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}], "gram": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}]}, {"v": "Tôi cần liên hệ với bộ phận liên quan để kiểm tra nguyên nhân của sự chậm trễ này.", "e": "I need to contact the relevant department to check the reason for this delay.", "f": "/aɪ niːd tuː ˈkɒntækt ðə ˈrɛlɪvənt dɪˈpɑːtmənt tuː tʃɛk ðə ˈriːzn fɔː ðɪs dɪˈleɪ/", "c": "我需要联系相关部门来核查延误原因。", "y": "Wǒ xūyào liánxì xiāngguān bùmén lái héchá yánwù yuányīn.", "vocab": [{"en": "contact", "cn": "联系", "py": "liánxì", "vi": "liên hệ", "ipa": "/ˈkɒntækt/", "pos": "động từ"}, {"en": "check", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/tʃɛk/", "pos": "động từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Việc gửi chậm chứng từ có thể ảnh hưởng đến lịch tàu.", "e": "The late sending of documents may affect the vessel schedule.", "f": "/ðə leɪt ˈsɛndɪŋ ɒv ˈdɒkjʊmənts meɪ əˈfɛkt ðə ˈvɛsl ˈʃɛdjuːl/", "c": "单据发送延迟可能会影响船期。", "y": "Dānjù fāsòng yánchí kěnéng huì yǐngxiǎng chuánqī.", "vocab": [{"en": "vessel", "cn": "船", "py": "chuán", "vi": "tàu", "ipa": "/ˈvɛsl/", "pos": "danh từ"}, {"en": "schedule", "cn": "计划", "py": "jìhuà", "vi": "lịch/kế hoạch", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi vẫn đang chờ chứng từ từ anh chị đấy.", "e": "We are still waiting for your documents.", "f": "/wiː ɑː stɪl ˈweɪtɪŋ fɔː jɔː ˈdɒkjʊmənts/", "c": "我们仍在等待您的单据。", "y": "Wǒmen réngzài děngdài nín de dānjù.", "vocab": [{"en": "documents", "cn": "据。", "py": "dānjù", "vi": "đấy.", "ipa": "/ˈdɒkjʊmənt/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Đơn hàng có bị chậm không?", "e": "Is the order delayed?", "f": "/ɪz ðɪ ˈɔːdə dɪˈleɪd/", "c": "订单延误了吗？", "y": "Dìngdān yánwù le ma?", "vocab": [{"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}], "gram": [{"en": "Is/Have + S + V3?", "cn": "S + V + 了 + 吗？", "note": "Hỏi về kết quả một việc đã/đang xảy ra."}]}, {"v": "Tàu bị chậm 2 ngày rồi do thời tiết xấu.", "e": "The vessel is delayed for two days due to bad weather.", "f": "/ðə ˈvɛsl ɪz dɪˈleɪd fɔː tuː deɪz djuː tuː bæd ˈwɛðə/", "c": "因天气恶劣，船只已延误2天。", "y": "Yīn tiānqì èliè, chuánzhī yǐ yánwù liǎng tiān.", "vocab": [{"en": "vessel", "cn": "船", "py": "chuán", "vi": "tàu", "ipa": "/ˈvɛsl/", "pos": "danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "bad weather", "cn": "恶劣天气", "py": "èliè tiānqì", "vi": "thời tiết xấu", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}], "gram": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}]}, {"v": "Một số sản phẩm đã bị hư hỏng trong quá trình vận chuyển, cho nên chúng tôi sẽ gửi hàng thay thế trong đợt giao tiếp theo.", "e": "Some products were damaged during transit, so we will send replacements in the next delivery.", "f": "/sʌm ˈprɒdʌkts wɜː ˈdæmɪʤd ˈdjʊərɪŋ ˈtrænsɪt, səʊ wiː wɪl send rɪˈpleɪsmənts ɪn ðə nɛkst dɪˈlɪvəri/", "c": "部分产品在运输途中受损，因此我们将在下次送货时发送替代品。", "y": "Bùfèn chǎnpǐn zài yùnshū túzhōng shòusǔn, yīncǐ wǒmen jiāng zài xiàcì sònghuò shí fāsòng tìdàipǐn.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "replacements", "cn": "替代品", "py": "tìdàipǐn", "vi": "hàng thay thế", "ipa": "/rɪˈpleɪsmənts/", "pos": "danh từ (số nhiều)"}, {"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Sau khi kiểm tra lô hàng, chúng tôi phát hiện một số sản phẩm bị hư hỏng nên sẽ gửi hàng thay thế trong đợt giao hàng tiếp theo.", "e": "After inspecting the shipment, we detected some damaged products and will send replacements in the next shipment.", "f": "/ˈɑːftər ɪnˈspɛktɪŋ ðə ˈʃɪpmənt, wiː dɪˈtɛktɪd sʌm ˈdæmɪʤd ˈprɒdʌkts ænd wɪl send rɪˈpleɪsmənts ɪn ðə nɛkst ˈʃɪpmənt/", "c": "检查货物后，我们发现部分产品受损，将在下次发货时提供替代品。", "y": "Jiǎnchá huòwù hòu, wǒmen fāxiàn bùfèn chǎnpǐn shòusǔn, jiāng zài xiàcì fāhuò shí tígōng tìdàipǐn.", "vocab": [{"en": "damaged products", "cn": "受损产品", "py": "shòusǔn chǎnpǐn", "vi": "sản phẩm hư hỏng", "ipa": "/ˈdæmɪdʒd ˈprɒdʌkts/", "pos": "cụm danh từ"}, {"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "replacements", "cn": "替代品", "py": "tìdàipǐn", "vi": "hàng thay thế", "ipa": "/rɪˈpleɪsmənts/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Nếu phát hiện bất kỳ sản phẩm nào bị thiếu hay bị hư hỏng, vui lòng liên hệ với chúng tôi trong 3 ngày kể từ ngày nhận hàng.", "e": "If you detect any missing or damaged products, please contact us within 3 days from the delivery date.", "f": "/ɪf juː dɪˈtɛkt ˈɛni ˈmɪsɪŋ ɔː ˈdæmɪʤd ˈprɒdʌkts, pliːz ˈkɒntækt ʌs wɪˈðɪn θriː deɪz frɒm ðə dɪˈlɪvəri deɪt/", "c": "如发现任何漏发或破损产品，请在收到货物之日起3天内联系我们。", "y": "Rú fāxiàn rènhé lòufā huò pòsǔn chǎnpǐn, qǐng zài shōudào huòwù zhī rì qǐ sān tiān nèi liánxì wǒmen.", "vocab": [{"en": "damaged products", "cn": "受损产品", "py": "shòusǔn chǎnpǐn", "vi": "sản phẩm hư hỏng", "ipa": "/ˈdæmɪdʒd ˈprɒdʌkts/", "pos": "cụm danh từ"}, {"en": "contact", "cn": "联系", "py": "liánxì", "vi": "liên hệ", "ipa": "/ˈkɒntækt/", "pos": "động từ"}, {"en": "delivery", "cn": "交货", "py": "jiāohuò", "vi": "giao hàng", "ipa": "/dɪˈlɪvəri/", "pos": "danh từ"}], "gram": [{"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"v": "Sau khi kiểm tra hàng hoá, chúng tôi nhận thấy một số thùng bị móp, nhưng may mắn là các sản phẩm bên trong không bị hư hỏng.", "e": "After checking the goods, we noticed some dented cartons, but fortunately, the products inside were not damaged.", "f": "/ˈɑːftə ˈtʃɛkɪŋ ðə ɡʊdz, wiː ˈnəʊtɪst sʌm ˈdɛntɪd ˈkɑːtənz, bʌt ˈfɔːtʃnətli, ðə ˈprɒdʌkts ɪnˈsaɪd wɜː nɒt ˈdæmɪʤd/", "c": "检查货物后，我们发现一些箱子变形了，但幸运的是，里面的产品没有受损。", "y": "Jiǎnchá huòwù hòu, wǒmen fāxiàn yīxiē xiāngzi biànxíng le, dàn xìngyùn de shì, lǐmiàn de chǎnpǐn méiyǒu shòusǔn.", "vocab": [{"en": "checking", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/ˈtʃɛkɪŋ/", "pos": "động từ (V-ing)"}, {"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "dented cartons", "cn": "变形的箱子", "py": "biànxíng de xiāngzi", "vi": "thùng bị móp", "ipa": "/ˈdɛntɪd ˈkɑːtənz/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi sẽ đưa ra giải pháp trong thời gian sớm nhất.", "e": "We will provide a solution as soon as possible.", "f": "/wiː wɪl prəˈvaɪd ə səˈluːʃən æz suːn æz ˈpɒsəbl/", "c": "我们将尽快提供解决方案。", "y": "Wǒmen jiāng jǐnkuài tígōng jiějué fāng'àn.", "vocab": [{"en": "provide", "cn": "提供", "py": "tígōng", "vi": "cung cấp", "ipa": "/prəˈvaɪd/", "pos": "động từ"}], "gram": [{"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}]}, {"v": "Tôi phát hiện ra một lỗi nhỏ trong địa chỉ của người nhận hàng nên cần chỉnh sửa lại chứng từ.", "e": "I detected a minor error in the consignee's address, so I need to edit the document.", "f": "/aɪ dɪˈtɛktɪd ə ˈmaɪnər ˈɛrər ɪn ðə ˌkɒnsaɪˈniːz əˈdrɛs, səʊ aɪ niːd tuː ˈɛdɪt ðə ˈdɒkjʊmənt/", "c": "我发现收件人地址有一个小错误，需要修改单据。", "y": "Wǒ fāxiàn shōujiànrén dìzhǐ yǒu yīgè xiǎo cuòwù, xūyào xiūgǎi dānjù.", "vocab": [{"en": "minor error", "cn": "小错误", "py": "xiǎo cuòwù", "vi": "lỗi nhỏ", "ipa": "/ˈmaɪnər ˈɛrə/", "pos": "cụm danh từ"}, {"en": "consignee", "cn": "收货人", "py": "shōuhuòrén", "vi": "người nhận hàng", "ipa": "/ˌkɒnsaɪˈniː/", "pos": "danh từ"}, {"en": "document", "cn": "单据", "py": "dānjù", "vi": "chứng từ", "ipa": "/ˈdɒkjʊmənt/", "pos": "danh từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Để tránh chậm trễ, vui lòng gửi hoá đơn thương mại và phiếu đóng gói trước khi lô hàng đến cảng.", "e": "To avoid delays, please send the commercial invoice and packing list before the shipment arrives at the port.", "f": "/tuː əˈvɔɪd dɪˈleɪz, pliːz send ðə kəˈmɜːʃəl ˈɪnvɔɪs ænd ˈpækɪŋ lɪst bɪˈfɔː ðə ˈʃɪpmənt əˈraɪvz æt ðə pɔːt/", "c": "为避免延误，请在货物到港前发送商业发票和装箱单。", "y": "Wèi bìmiǎn yánwù, qǐng zài huòwù dào gǎng qián fāsòng shāngyè fāpiào hé zhuāngxiāngdān.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "commercial invoice", "cn": "商业发票", "py": "shāngyè fāpiào", "vi": "hóa đơn thương mại", "ipa": "/kəˈmɜːʃəl ˈɪnvɔɪs/", "pos": "cụm danh từ"}, {"en": "packing list", "cn": "装箱单", "py": "zhuāngxiāngdān", "vi": "phiếu đóng gói", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Do thời tiết xấu nên lô hàng sẽ bị chậm khoảng 2 ngày so với kế hoạch ban đầu.", "e": "Due to bad weather, the shipment will be delayed by about 2 days compared to the original schedule.", "f": "/djuː tuː bæd ˈwɛðə, ðə ˈʃɪpmənt wɪl biː dɪˈleɪd baɪ əˈbaʊt tuː deɪz kəmˈpeəd tuː ðɪ əˈrɪʤənl ˈʃɛdjuːl/", "c": "由于天气恶劣，货物将比原计划延误约2天。", "y": "Yóuyú tiānqì èliè, huòwù jiāng bǐ yuán jìhuà yánwù yuē liǎng tiān.", "vocab": [{"en": "bad weather", "cn": "恶劣天气", "py": "èliè tiānqì", "vi": "thời tiết xấu", "ipa": "/bæd ˈwɛðə/", "pos": "cụm danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "schedule", "cn": "计划", "py": "jìhuà", "vi": "lịch/kế hoạch", "ipa": "/ˈʃɛdjuːl/", "pos": "danh từ"}], "gram": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}]}, {"v": "Vui lòng hỗ trợ sớm để tránh phát sinh chi phí.", "e": "Please support early to avoid incurring extra costs.", "f": "/pliːz səˈpɔːt ˈɜːli tuː əˈvɔɪd ɪnˈkɜːrɪŋ ˈɛkstrə kɒsts/", "c": "请尽快协助以避免产生额外费用。", "y": "Qǐng jǐnkuài xiézhù yǐ bìmiǎn chǎnshēng éwài fèiyòng.", "vocab": [{"en": "extra costs", "cn": "额外费用", "py": "éwài fèiyòng", "vi": "chi phí phụ", "ipa": "/ˈɛkstrə kɒsts/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}], "gramCore": [{"en": "..., due to + N", "cn": "..., 由于 + mệnh đề", "note": "Nguyên nhân - kết quả: do/bởi vì."}, {"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}, {"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}, {"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}, {"en": "Is/Have + S + V3?", "cn": "S + V + 了 + 吗？", "note": "Hỏi về kết quả một việc đã/đang xảy ra."}, {"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}, {"en": "S + will + V", "cn": "S + 将/会 + V", "note": "Diễn tả việc sẽ xảy ra trong tương lai."}, {"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"id": 7, "vi": "Tài chính & Thanh toán", "en": "Finance & Payment", "context": "Xử lý các giao dịch tài chính: nhắc nhở đối tác thanh toán đúng hạn, đính kèm hóa đơn, xác nhận đã nhận tiền và xử lý phát sinh chi phí phạt (demurrage/detention).", "vocab": [{"en": "supplier", "vi": "nhà cung cấp", "cn": "供应商", "py": "gōngyìngshāng", "ipa": "/səˈplaɪə/", "pos": "danh từ"}, {"en": "advance payment", "vi": "thanh toán trước", "cn": "预付货款", "py": "yùfù huòkuǎn", "ipa": "/ədˈvɑːns ˈpeɪmənt/", "pos": "cụm danh từ"}, {"en": "payment", "vi": "thanh toán", "cn": "付款", "py": "fùkuǎn", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "attached invoice", "vi": "hoá đơn đính kèm", "cn": "随附的发票", "py": "suífù de fāpiào", "ipa": "/əˈtætʃt ˈɪnvɔɪs/", "pos": "cụm danh từ"}, {"en": "release", "vi": "phát hành", "cn": "签发", "py": "qiānfā", "ipa": "/rɪˈliːs/", "pos": "động từ"}, {"en": "goods", "vi": "hàng hoá", "cn": "货物", "py": "huòwù", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "week", "vi": "tuần", "cn": "周", "py": "zhōu", "ipa": "/wiːk/", "pos": "danh từ"}, {"en": "order", "vi": "đơn hàng", "cn": "订单", "py": "dìngdān", "ipa": "/ˈɔːdə/", "pos": "danh từ"}, {"en": "bill of lading", "vi": "vận đơn", "cn": "提单", "py": "tídān", "ipa": "/bɪl ɒv ˈleɪdɪŋ/", "pos": "cụm danh từ"}, {"en": "delayed", "vi": "chậm trễ", "cn": "延误", "py": "yánwù", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}, {"en": "invoice", "vi": "hóa đơn", "cn": "发票", "py": "fāpiào", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}, {"en": "packing list", "vi": "phiếu đóng gói", "cn": "装箱单", "py": "zhuāngxiāngdān", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}, {"en": "sales contract", "vi": "hợp đồng mua bán", "cn": "销售合同", "py": "xiāoshòu hétóng", "ipa": "/seɪlz ˈkɒntrækt/", "pos": "cụm danh từ"}, {"en": "discrepancy", "vi": "sự khác biệt", "cn": "差异", "py": "chāyì", "ipa": "/dɪsˈkrɛpənsi/", "pos": "danh từ"}, {"en": "commercial invoice", "vi": "hóa đơn thương mại", "cn": "商业发票", "py": "shāngyè fāpiào", "ipa": "/kəˈmɜːʃəl ˈɪnvɔɪs/", "pos": "cụm danh từ"}], "sentences": [{"v": "Nhà cung cấp yêu cầu thanh toán trước 50%.", "e": "The supplier requires a 50% advance payment.", "f": "/ðə səˈplaɪə rɪˈkwaɪəz ə ˈfɪfti pəˈsɛnt ədˈvɑːns ˈpeɪmənt/", "c": "供应商要求预付50%的货款。", "y": "Gōngyìngshāng yāoqiú yùfù bǎifēnzhī wǔshí de huòkuǎn.", "vocab": [{"en": "supplier", "cn": "供应商", "py": "gōngyìngshāng", "vi": "nhà cung cấp", "ipa": "/səˈplaɪə/", "pos": "danh từ"}, {"en": "advance payment", "cn": "预付货款", "py": "yùfù huòkuǎn", "vi": "thanh toán trước", "ipa": "/ədˈvɑːns ˈpeɪmənt/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi đã nhận được khoản thanh toán của anh chị rồi.", "e": "We have already received your payment.", "f": "/wiː hæv ɔːlˈrɛdi rɪˈsiːvd jɔː ˈpeɪmənt/", "c": "我们已经收到您的付款了。", "y": "Wǒmen yǐjīng shōudào nín de fùkuǎn le.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Xin vui lòng thanh toán trước ngày 15 nha.", "e": "Please make the payment before the 15th.", "f": "/pliːz meɪk ðə ˈpeɪmənt bɪˈfɔː ðɪ fɪfˈtiːnθ/", "c": "请在15号之前付款。", "y": "Qǐng zài shíwǔ hào zhīqián fùkuǎn.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Xin vui lòng thanh toán theo hoá đơn đã đính kèm.", "e": "Please pay according to the attached invoice.", "f": "/pliːz peɪ əˈkɔːdɪŋ tuː ðɪ əˈtætʃt ˈɪnvɔɪs/", "c": "请按照随附的发票付款。", "y": "Qǐng ànzhào suífù de fāpiào fùkuǎn.", "vocab": [{"en": "attached invoice", "cn": "随附的发票", "py": "suífù de fāpiào", "vi": "hoá đơn đính kèm", "ipa": "/əˈtætʃt ˈɪnvɔɪs/", "pos": "cụm danh từ"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Chúng tôi vẫn chưa nhận được khoản thanh toán nào.", "e": "We still have not received any payment.", "f": "/wiː stɪl hæv nɒt rɪˈsiːvd ˈɛni ˈpeɪmənt/", "c": "我们仍未收到任何付款。", "y": "Wǒmen réngwèi shōudào rènhé fùkuǎn.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Sau khi nhận được thanh toán, chúng tôi sẽ phát hành chứng từ.", "e": "After receiving payment, we will release the documents.", "f": "/ˈɑːftə rɪˈsiːvɪŋ ˈpeɪmənt, wiː wɪl rɪˈliːs ðə ˈdɒkjʊmənts/", "c": "收到付款后，我们将签发单据。", "y": "Shōudào fùkuǎn hòu, wǒmen jiāng qiānfā dānjù.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "release", "cn": "签发", "py": "qiānfā", "vi": "phát hành", "ipa": "/rɪˈliːs/", "pos": "động từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Nếu không nhận được thanh toán trước 5h chiều, chúng tôi sẽ phải giao hàng sang tuần sau.", "e": "If we do not receive payment before 5 PM, we will have to deliver the goods next week.", "f": "/ɪf wiː duː nɒt rɪˈsiːv ˈpeɪmənt bɪˈfɔː faɪv piː-ɛm, wiː wɪl hæv tuː dɪˈlɪvə ðə ɡʊdz nɛkst wiːk/", "c": "如果下午5点前未收到货款，我们将不得不安排下周发货。", "y": "Rúguǒ xiàwǔ wǔ diǎn qián wèi shōudào huòkuǎn, wǒmen jiāng bùdébù ānpái xià zhōu fāhuò.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}, {"en": "week", "cn": "周", "py": "zhōu", "vi": "tuần", "ipa": "/wiːk/", "pos": "danh từ"}], "gram": [{"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"v": "Nếu chúng tôi không nhận được thanh toán trước thứ 6 thì đơn hàng sẽ không được xử lý tiếp đâu.", "e": "If we do not receive payment before Friday, the order will not be processed further.", "f": "/ɪf wiː duː nɒt rɪˈsiːv ˈpeɪmənt bɪˈfɔː ˈfraɪdeɪ, ðɪ ˈɔːdə wɪl nɒt biː ˈprəʊsɛst ˈfɜːðə/", "c": "如果我们周五前未收到货款，订单将停止处理。", "y": "Rúguǒ wǒmen zhōuwǔ qián wèi shōudào huòkuǎn, dìngdān jiāng tíngzhǐ chǔlǐ.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}], "gram": [{"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"v": "Nếu chúng tôi không nhận được thanh toán đúng hạn, việc phát hành vận đơn có thể bị chậm.", "e": "If we do not receive payment on time, the release of the Bill of Lading may be delayed.", "f": "/ɪf wiː duː nɒt rɪˈsiːv ˈpeɪmənt ɒn taɪm, ðə rɪˈliːs ɒv ðə bɪl ɒv ˈleɪdɪŋ meɪ biː dɪˈleɪd/", "c": "如果我们未能按时收到货款，提单的签发可能会被延误。", "y": "Rúguǒ wǒmen wèinéng ànshí shōudào huòkuǎn, tídān de qiānfā kěnéng huì bèi yánwù.", "vocab": [{"en": "payment", "cn": "付款", "py": "fùkuǎn", "vi": "thanh toán", "ipa": "/ˈpeɪmənt/", "pos": "danh từ"}, {"en": "bill of lading", "cn": "提单", "py": "tídān", "vi": "vận đơn", "ipa": "/bɪl ɒv ˈleɪdɪŋ/", "pos": "cụm danh từ"}, {"en": "delayed", "cn": "延误", "py": "yánwù", "vi": "chậm trễ", "ipa": "/dɪˈleɪd/", "pos": "tính từ"}], "gram": [{"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"v": "Vui lòng kiểm tra lại hoá đơn và phiếu đóng gói để đảm bảo tất cả các thông tin đều chính xác trước khi hàng được xuất đi.", "e": "Please recheck the invoice and packing list to ensure all information is correct before the goods are shipped.", "f": "/pliːz riːˈtʃɛk ðə ˈɪnvɔɪs ænd ˈpækɪŋ lɪst tuː ɪnˈʃʊər ɔːl ˌɪnfəˈmeɪʃən ɪz kəˈrɛkt bɪˈfɔː ðə ɡʊdz ɑː ʃɪpt/", "c": "货物发运前，请再次核对发票和装箱单，以确保所有信息准确无误。", "y": "Huòwù fāyùn qián, qǐng zàicì héduì fāpiào hé zhuāngxiāngdān, yǐ quèbǎo suǒyǒu xìnxī zhǔnquè wúwù.", "vocab": [{"en": "invoice", "cn": "发票", "py": "fāpiào", "vi": "hóa đơn", "ipa": "/ˈɪnvɔɪs/", "pos": "danh từ"}, {"en": "packing list", "cn": "装箱单", "py": "zhuāngxiāngdān", "vi": "phiếu đóng gói", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}, {"en": "goods", "cn": "货物", "py": "huòwù", "vi": "hàng hoá", "ipa": "/ɡʊdz/", "pos": "danh từ (số nhiều)"}], "gram": [{"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}]}, {"v": "Chúng tôi cần hợp đồng mua bán.", "e": "We need the sales contract.", "f": "/wiː niːd ðə seɪlz ˈkɒntrækt/", "c": "我们需要销售合同。", "y": "Wǒmen xūyào xiāoshòu hétóng.", "vocab": [{"en": "sales contract", "cn": "销售合同", "py": "xiāoshòu hétóng", "vi": "hợp đồng mua bán", "ipa": "/seɪlz ˈkɒntrækt/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi nhận thấy có sự khác biệt giữa hoá đơn thương mại và danh sách hàng hoá.", "e": "We noticed a discrepancy between the commercial invoice and the packing list.", "f": "/wiː ˈnəʊtɪst ə dɪsˈkrɛpənsi bɪˈtwiːn ðə kəˈmɜːʃəl ˈɪnvɔɪs ænd ðə ˈpækɪŋ lɪst/", "c": "我们发现商业发票与装箱单之间存在差异。", "y": "Wǒmen fāxiàn shāngyè fāpiào yǔ zhuāngxiāngdān zhījiān cúnzài chāyì.", "vocab": [{"en": "discrepancy", "cn": "差异", "py": "chāyì", "vi": "sự khác biệt", "ipa": "/dɪsˈkrɛpənsi/", "pos": "danh từ"}, {"en": "commercial invoice", "cn": "商业发票", "py": "shāngyè fāpiào", "vi": "hóa đơn thương mại", "ipa": "/kəˈmɜːʃəl ˈɪnvɔɪs/", "pos": "cụm danh từ"}, {"en": "packing list", "cn": "装箱单", "py": "zhuāngxiāngdān", "vi": "phiếu đóng gói", "ipa": "/ˈpækɪŋ lɪst/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}], "gramCore": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}, {"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}, {"en": "Please + V + O", "cn": "请 + V + O", "note": "Vui lòng..."}, {"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"id": 8, "vi": "CSKH & Giao tiếp Công sở", "en": "Customer Service & Office", "context": "Hoàn thiện kỹ năng mềm: khảo sát độ hài lòng của khách hàng, đàm phán khéo léo, viết báo cáo cho quản lý và phối hợp hiệu quả giữa các phòng ban dưới áp lực deadline.", "vocab": [{"en": "send", "vi": "gửi", "cn": "发送", "py": "fāsòng", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "revenue report", "vi": "báo cáo doanh thu", "cn": "收入报告", "py": "shōurù bàogào", "ipa": "/ˈrɛvɪnjuː rɪˈpɔːt/", "pos": "cụm danh từ"}, {"en": "customer", "vi": "khách hàng", "cn": "客户", "py": "kèhù", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "positive feedback", "vi": "phản hồi tích cực", "cn": "积极反馈", "py": "jījí fǎnhuí", "ipa": "/ˈpɒzətɪv ˈfiːdbæk/", "pos": "cụm danh từ"}, {"en": "communication skills", "vi": "kỹ năng giao tiếp", "cn": "沟通技巧", "py": "gōutōng jìqiǎo", "ipa": "/kəˌmjuːnɪˈkeɪʃən skɪlz/", "pos": "cụm danh từ"}, {"en": "postponed", "vi": "hoãn lại", "cn": "推迟", "py": "tuīchí", "ipa": "/pəʊstˈpəʊnd/", "pos": "động từ (quá khứ)"}, {"en": "coordination", "vi": "phối hợp", "cn": "协调", "py": "xiétiáo", "ipa": "/kəʊˌɔːdɪˈneɪʃən/", "pos": "danh từ"}, {"en": "logistics", "vi": "logistics", "cn": "物流", "py": "wùliú", "ipa": "/ləˈdʒɪstɪks/", "pos": "danh từ"}, {"en": "look forward to", "vi": "mong chờ, mong muốn", "cn": "期待", "py": "qīdài", "ipa": "/lʊk ˈfɔːwəd tuː/", "pos": "cụm động từ"}, {"en": "partnership", "vi": "hợp tác", "cn": "合作", "py": "hézuò", "ipa": "/ˈpɑːtnəʃɪp/", "pos": "danh từ"}, {"en": "satisfied", "vi": "hài lòng", "cn": "满意", "py": "mǎnyì", "ipa": "/ˈsætɪsfaɪd/", "pos": "tính từ"}, {"en": "contact", "vi": "liên hệ", "cn": "联系", "py": "liánxì", "ipa": "/ˈkɒntækt/", "pos": "động từ"}, {"en": "international", "vi": "quốc tế", "cn": "国际", "py": "guójì", "ipa": "/ˌɪntəˈnæʃənl/", "pos": "tính từ"}, {"en": "shipping line", "vi": "hãng tàu", "cn": "船公司", "py": "chuán gōngsī", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}, {"en": "in charge of", "vi": "phụ trách", "cn": "负责", "py": "fùzé", "ipa": "/ɪn tʃɑːdʒ ɒv/", "pos": "cụm động từ"}, {"en": "checking", "vi": "kiểm tra", "cn": "检查", "py": "jiǎnchá", "ipa": "/ˈtʃɛkɪŋ/", "pos": "động từ (V-ing)"}, {"en": "accurate", "vi": "chính xác", "cn": "准确无误", "py": "zhǔnquè wúwù", "ipa": "/ˈækjʊrɪt/", "pos": "tính từ"}, {"en": "status", "vi": "tình trạng", "cn": "状态", "py": "zhuàngtài", "ipa": "/ˈsteɪtəs/", "pos": "danh từ"}, {"en": "pressured deadlines", "vi": "deadline áp lực", "cn": "压力很大的截止日期", "py": "yālì hěndà de jiézhǐ rìqī", "ipa": "/ˈprɛʃəd ˈdɛdlaɪnz/", "pos": "cụm danh từ"}, {"en": "order", "vi": "đơn hàng", "cn": "订单", "py": "dìngdān", "ipa": "/ˈɔːdə/", "pos": "danh từ"}], "sentences": [{"v": "Tôi cần gửi báo cáo doanh thu cho quản lý trước 5 giờ.", "e": "I need to send the revenue report to the manager before 5 o'clock.", "f": "/aɪ niːd tuː send ðə ˈrɛvɪnjuː rɪˈpɔːt tuː ðə ˈmænɪʤə bɪˈfɔː faɪv əˈklɒk/", "c": "我需要在5点前把收入报告发给经理。", "y": "Wǒ xūyào zài wǔ diǎn qián bǎ shōurù bàogào fā gěi jīnglǐ.", "vocab": [{"en": "send", "cn": "发送", "py": "fāsòng", "vi": "gửi", "ipa": "/sɛnd/", "pos": "động từ"}, {"en": "revenue report", "cn": "收入报告", "py": "shōurù bàogào", "vi": "báo cáo doanh thu", "ipa": "/ˈrɛvɪnjuː rɪˈpɔːt/", "pos": "cụm danh từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Bộ phận chăm sóc khách hàng đã nhận được nhiều phản hồi tích cực.", "e": "The customer care department has received a lot of positive feedback.", "f": "/ðə ˈkʌstəmə keə dɪˈpɑːtmənt hæz rɪˈsiːvd ə lɒt ɒv ˈpɒzətɪv ˈfiːdbæk/", "c": "客户服务部门收到了很多积极反馈。", "y": "Kèhù fúwù bùmén shōudào le hěnduō jījí fǎnhuí.", "vocab": [{"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "positive feedback", "cn": "积极反馈", "py": "jījí fǎnhuí", "vi": "phản hồi tích cực", "ipa": "/ˈpɒzətɪv ˈfiːdbæk/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi cần cải thiện khả năng giao tiếp trong môi trường công sở.", "e": "We need to improve our communication skills in the office environment.", "f": "/wiː niːd tuː ɪmˈpruːv ˈaʊə kəˌmjuːnɪˈkeɪʃən skɪlz ɪn ðɪ ˈɒfɪs ɪnˈvaɪərənmənt/", "c": "我们需要提高在办公环境中的沟通技巧。", "y": "Wǒmen xūyào tígāo zài bàngōng huánjìng zhōng de gōutōng jìqiǎo.", "vocab": [{"en": "communication skills", "cn": "沟通技巧", "py": "gōutōng jìqiǎo", "vi": "kỹ năng giao tiếp", "ipa": "/kəˌmjuːnɪˈkeɪʃən skɪlz/", "pos": "cụm danh từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Cuộc họp bị hoãn vì đang xử lý một số vấn đề khẩn cấp.", "e": "The meeting was postponed because we are handling some urgent matters.", "f": "/ðə ˈmiːtɪŋ wɒz pəʊstˈpəʊnd bɪˈkɒz wiː ɑː ˈhændlɪŋ sʌm ˈɜːʤənt ˈmætəz/", "c": "会议被推迟了，因为我们正在处理一些紧急事务。", "y": "Huìyì bèi tuīchí le, yīnwèi wǒmen zhèngzài chǔlǐ yīxiē jǐnjí shìwù.", "vocab": [{"en": "postponed", "cn": "推迟", "py": "tuīchí", "vi": "hoãn lại", "ipa": "/pəʊstˈpəʊnd/", "pos": "động từ (quá khứ)"}], "gram": [{"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}]}, {"v": "Việc phối hợp giữa các phòng ban thực sự chưa hiệu quả.", "e": "Coordination between departments is indeed not effective yet.", "f": "/kəʊˌɔːdɪˈneɪʃən bɪˈtwiːn dɪˈpɑːtmənts ɪz ɪnˈdiːd nɒt ɪˈfɛktɪv jɛt/", "c": "部门之间的协调确实还不高效。", "y": "Bùmén zhījiān de xiétiáo quèshí hái bù gāoxiào.", "vocab": [{"en": "coordination", "cn": "协调", "py": "xiétiáo", "vi": "phối hợp", "ipa": "/kəʊˌɔːdɪˈneɪʃən/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Tôi muốn cải thiện tiếng Anh logistics và công sở.", "e": "I want to improve my logistics and business English.", "f": "/aɪ wɒnt tuː ɪmˈpruːv maɪ lɒˈʤɪstɪks ænd ˈbɪznɪs ˈɪŋɡlɪʃ/", "c": "我想提高我的物流和商务英语。", "y": "Wǒ xiǎng tígāo wǒ de wùliú hé shāngwù Yīngyǔ.", "vocab": [{"en": "logistics", "cn": "物流", "py": "wùliú", "vi": "logistics", "ipa": "/ləˈdʒɪstɪks/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Cảm ơn các anh chị đã phối hợp hỗ trợ trong suốt quá trình xử lý lô hàng.", "e": "Thank you for your coordination and support throughout the shipment handling process.", "f": "/θæŋk juː fɔː jɔː kəʊˌɔːdɪˈneɪʃən ænd səˈpɔːt θruːˈaʊt ðə ˈʃɪpmənt ˈhændlɪŋ ˈprəʊsɛs/", "c": "感谢您在整批货物处理过程中的协调与支持。", "y": "Gǎnxiè nín zài zhěng pī huòwù chǔlǐ guòchéng zhōng de xiétiáo yǔ zhīchí.", "vocab": [{"en": "coordination", "cn": "协调", "py": "xiétiáo", "vi": "phối hợp", "ipa": "/kəʊˌɔːdɪˈneɪʃən/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Chúng tôi rất mong tiếp tục được đồng hành cùng anh chị trong những lô hàng sắp tới.", "e": "We look forward to continuing our partnership with you in upcoming shipments.", "f": "/wiː lʊk ˈfɔːwəd tuː kənˈtɪnjuːɪŋ ˈaʊə ˈpɑːtnəʃɪp wɪð juː ɪn ˈʌpˌkʌmɪŋ ˈʃɪpmənts/", "c": "我们期待在未来的发货中继续与您合作。", "y": "Wǒmen qīdài zài wèilái de fāhuò zhōng jìxù yǔ nín hézuò.", "vocab": [{"en": "look forward to", "cn": "期待", "py": "qīdài", "vi": "mong chờ, mong muốn", "ipa": "/lʊk ˈfɔːwəd tuː/", "pos": "cụm động từ"}, {"en": "partnership", "cn": "合作", "py": "hézuò", "vi": "hợp tác", "ipa": "/ˈpɑːtnəʃɪp/", "pos": "danh từ"}], "gram": [{"en": "look forward to + V-ing", "cn": "期待 + V-ing", "note": "Sau 'look forward to', động từ theo sau phải ở dạng V-ing."}]}, {"v": "Anh chị có hài lòng với dịch vụ của chúng tôi không?", "e": "Are you satisfied with our service?", "f": "/ɑː juː ˈsætɪsfaɪd wɪð ˈaʊə ˈsɜːvɪs/", "c": "您对我们的服务满意吗？", "y": "Nín duì wǒmen de fúwù mǎnyì ma?", "vocab": [{"en": "satisfied", "cn": "满意", "py": "mǎnyì", "vi": "hài lòng", "ipa": "/ˈsætɪsfaɪd/", "pos": "tính từ"}], "gram": [{"en": "be satisfied with + N", "cn": "对 + N + 满意", "note": "Hài lòng với..."}]}, {"v": "Bạn có hài lòng với nhân viên của chúng tôi hay không?", "e": "Are you satisfied with our staff?", "f": "/ɑː juː ˈsætɪsfaɪd wɪð ˈaʊə stɑːf/", "c": "您对我们的工作人员满意吗？", "y": "Nín duì wǒmen de gōngzuò rényuán mǎnyì ma?", "vocab": [{"en": "satisfied", "cn": "满意", "py": "mǎnyì", "vi": "hài lòng", "ipa": "/ˈsætɪsfaɪd/", "pos": "tính từ"}], "gram": [{"en": "be satisfied with + N", "cn": "对 + N + 满意", "note": "Hài lòng với..."}]}, {"v": "Bạn có hài lòng với sản phẩm của chúng tôi không?", "e": "Are you satisfied with our products?", "f": "/ɑː juː ˈsætɪsfaɪd wɪð ˈaʊə ˈprɒdʌkts/", "c": "您对我们的产品满意吗？", "y": "Nín duì wǒmen de chǎnpǐn mǎnyì ma?", "vocab": [{"en": "satisfied", "cn": "满意", "py": "mǎnyì", "vi": "hài lòng", "ipa": "/ˈsætɪsfaɪd/", "pos": "tính từ"}], "gram": [{"en": "be satisfied with + N", "cn": "对 + N + 满意", "note": "Hài lòng với..."}]}, {"v": "Anh chị có bất cứ câu hỏi nào xin vui lòng liên hệ với chúng tôi.", "e": "If you have any questions, please feel free to contact us.", "f": "/ɪf juː hæv ˈɛni ˈkwɛstʃənz, pliːz fiːl friː tuː ˈkɒntækt ʌs/", "c": "如果您有任何疑问，请随时与我们联系。", "y": "Rúguǒ nín yǒu rènhé yíwèn, qǐng suíshí yǔ wǒmen liánxì.", "vocab": [{"en": "contact", "cn": "联系", "py": "liánxì", "vi": "liên hệ", "ipa": "/ˈkɒntækt/", "pos": "động từ"}], "gram": [{"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}]}, {"v": "Tôi làm việc cho hãng tàu quốc tế và phụ trách xử lý các chứng từ liên quan đến hàng xuất khẩu.", "e": "I work for an international shipping line and am in charge of handling documents related to export cargo.", "f": "/aɪ wɜːk fɔːr æn ˌɪntəˈnæʃənl ˈʃɪpɪŋ laɪn ænd æm ɪn tʃɑːʤ ɒv ˈhændlɪŋ ˈdɒkjʊmənts rɪˈleɪtɪd tuː ˈɛkspɔːt ˈkɑːɡəʊ/", "c": "我在一家国际船公司工作，负责处理与出口货物相关的单据。", "y": "Wǒ zài yījiā guójì chuán gōngsī gōngzuò, fùzé chǔlǐ yǔ chūkǒu huòwù xiāngguān de dānjù.", "vocab": [{"en": "international", "cn": "国际", "py": "guójì", "vi": "quốc tế", "ipa": "/ˌɪntəˈnæʃənl/", "pos": "tính từ"}, {"en": "shipping line", "cn": "船公司", "py": "chuán gōngsī", "vi": "hãng tàu", "ipa": "/ˈʃɪpɪŋ laɪn/", "pos": "cụm danh từ"}, {"en": "in charge of", "cn": "负责", "py": "fùzé", "vi": "phụ trách", "ipa": "/ɪn tʃɑːdʒ ɒv/", "pos": "cụm động từ"}], "gram": [{"en": "be in charge of + V-ing", "cn": "负责 + V-ing", "note": "Phụ trách việc gì (sau 'of' dùng V-ing)."}]}, {"v": "Công việc chính của tôi là kiểm tra vận đơn và đảm bảo tất cả các chứng từ đều chính xác.", "e": "My main job is checking Bills of Lading and ensuring that all documents are accurate.", "f": "/maɪ meɪn ʤɒb ɪz ˈtʃɛkɪŋ bɪlz ɒv ˈleɪdɪŋ ænd ɪnˈʃʊərɪŋ ðæt ɔːl ˈdɒkjʊmənts ɑːr ˈækjʊrɪt/", "c": "我的主要工作是检查提单并确保所有单据都准确无误。", "y": "Wǒ de zhǔyào gōngzuò shì jiǎnchá tídān bìng quèbǎo suǒyǒu dānjù dōu zhǔnquè wúwù.", "vocab": [{"en": "checking", "cn": "检查", "py": "jiǎnchá", "vi": "kiểm tra", "ipa": "/ˈtʃɛkɪŋ/", "pos": "động từ (V-ing)"}, {"en": "accurate", "cn": "准确无误", "py": "zhǔnquè wúwù", "vi": "chính xác", "ipa": "/ˈækjʊrɪt/", "pos": "tính từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Khách hàng vừa liên hệ với chúng tôi để hỏi về tình trạng của một lô hàng đang được vận chuyển đến Singapore.", "e": "The customer has just contacted us to ask about the status of a shipment being transported to Singapore.", "f": "/ðə ˈkʌstəmə hæz ʤʌst ˈkɒntæktɪd ʌs tuː ɑːsk əˈbaʊt ðə ˈsteɪtəs ɒv ə ˈʃɪpmənt ˈbiːɪŋ trænsˈpɔːtɪd tuː ˈsɪŋɡəpɔː/", "c": "客户刚刚联系我们，询问运往新加坡的一批货物的状态。", "y": "Kèhù gānggāng liánxì wǒmen, xùnwèn yùn wǎng Xīnjiāpō de yī pī huòwù de zhuàngtài.", "vocab": [{"en": "customer", "cn": "客户", "py": "kèhù", "vi": "khách hàng", "ipa": "/ˈkʌstəmə/", "pos": "danh từ"}, {"en": "status", "cn": "状态", "py": "zhuàngtài", "vi": "tình trạng", "ipa": "/ˈsteɪtəs/", "pos": "danh từ"}], "gram": [{"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}, {"v": "Tôi thường làm việc với deadline khá là áp lực.", "e": "I usually work under quite pressured deadlines.", "f": "/aɪ ˈjuːʒʊəli wɜːk ˈʌndə kwaɪt ˈprɛʃəd ˈdɛdlaɪnz/", "c": "我通常在压力很大的截止日期下工作。", "y": "Wǒ tōngcháng zài yālì hěndà de jiézhǐ rìqī xià gōngzuò.", "vocab": [{"en": "pressured deadlines", "cn": "压力很大的截止日期", "py": "yālì hěndà de jiézhǐ rìqī", "vi": "deadline áp lực", "ipa": "/ˈprɛʃəd ˈdɛdlaɪnz/", "pos": "cụm danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Tôi cần xử lý đơn hàng này càng sớm càng tốt.", "e": "I need to handle this order as soon as possible.", "f": "/aɪ niːd tuː ˈhændl ðɪs ˈɔːdə æz suːn æz ˈpɒsəbl/", "c": "我需要尽快处理这个订单。", "y": "Wǒ xūyào jǐnkuài chǔlǐ zhège dìngdān.", "vocab": [{"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}], "gram": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}]}, {"v": "Bộ phận logistics cần xử lý một đơn hàng quốc tế khá gấp.", "e": "The logistics department needs to handle a rather urgent international order.", "f": "/ðə lɒˈʤɪstɪks dɪˈpɑːtmənt niːdz tuː ˈhændl ə ˈrɑːðər ˈɜːʤənt ˌɪntəˈnæʃənl ˈɔːdə/", "c": "物流部门需要处理一个相当紧急的国际订单。", "y": "Wùliú bùmén xūyào chǔlǐ yīgè xiāngdāng jǐnjí de guójì dìngdān.", "vocab": [{"en": "logistics", "cn": "物流", "py": "wùliú", "vi": "logistics", "ipa": "/ləˈdʒɪstɪks/", "pos": "danh từ"}, {"en": "international", "cn": "国际", "py": "guójì", "vi": "quốc tế", "ipa": "/ˌɪntəˈnæʃənl/", "pos": "tính từ"}, {"en": "order", "cn": "订单", "py": "dìngdān", "vi": "đơn hàng", "ipa": "/ˈɔːdə/", "pos": "danh từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}, {"v": "Anh ấy có kinh nghiệm làm việc với các đối tác quốc tế.", "e": "He has experience working with international partners.", "f": "/hiː hæz ɪksˈpɪərɪəns ˈwɜːkɪŋ wɪð ˌɪntəˈnæʃənl ˈpɑːtnəz/", "c": "他有与国际合作伙伴工作的经验。", "y": "Tā yǒu yǔ guójì hézuò huǒbàn gōngzuò de jīngyàn.", "vocab": [{"en": "international", "cn": "国际", "py": "guójì", "vi": "quốc tế", "ipa": "/ˌɪntəˈnæʃənl/", "pos": "tính từ"}], "gram": [{"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}]}], "gramCore": [{"en": "need to + V", "cn": "需要 + V", "note": "Cần làm gì."}, {"en": "S + V + O", "cn": "S + V + O", "note": "Câu trần thuật cơ bản."}, {"en": "be + V-ing", "cn": "正在 + V", "note": "Đang làm gì (hiện tại tiếp diễn)."}, {"en": "look forward to + V-ing", "cn": "期待 + V-ing", "note": "Sau 'look forward to', động từ theo sau phải ở dạng V-ing."}, {"en": "be satisfied with + N", "cn": "对 + N + 满意", "note": "Hài lòng với..."}, {"en": "If + S + V (hiện tại), S + will + V", "cn": "如果 + mệnh đề，就/将 + V", "note": "Câu điều kiện: Nếu... thì..."}, {"en": "be in charge of + V-ing", "cn": "负责 + V-ing", "note": "Phụ trách việc gì (sau 'of' dùng V-ing)."}, {"en": "have/has (+ already/just) + V3", "cn": "已经/刚刚 + V + 了", "note": "Thì hiện tại hoàn thành: đã làm gì (rồi)."}]}];
+const STEP_KEYS = ['sentences','reading','listening','writing','test'];
+const STEP_LABELS = {sentences:'Học câu',reading:'Đọc',listening:'Nghe',writing:'Viết',test:'Kiểm tra'};
+const STEP_ICONS = {sentences:'💬',reading:'📖',listening:'🎧',writing:'✍️',test:'🏁'};
+const SCHEMA_VERSION = 3;
+
+/* ============ STORAGE ============ */
+let STATE = null;
+
+function defaultState(){
+  const days = {};
+  DATA.forEach(d=>{
+    days[d.id] = {
+      hardSentences:[],
+      stepsDone:{sentences:false,reading:false,listening:false,writing:false,test:false},
+      testScore:null, testCats:null, completed:false, unlocked: d.id===1
+    };
+  });
+  return { xp:0, streak:0, lastActiveDate:null, currentDay:1, currentStep:0, days, wrongPool:[], mode:'both', schemaVersion: SCHEMA_VERSION };
+}
+
+const STORAGE_KEY = 'lltp_state_v3';
+
+async function loadState(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('state');
+      if(r && r.value){
+        const parsed = JSON.parse(r.value);
+        if(parsed && parsed.schemaVersion === SCHEMA_VERSION){ STATE = parsed; return; }
+      }
+    }
+  }catch(e){}
+  try{
+    const raw = window.localStorage ? window.localStorage.getItem(STORAGE_KEY) : null;
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && parsed.schemaVersion === SCHEMA_VERSION){ STATE = parsed; return; }
+    }
+  }catch(e){}
+  STATE = defaultState();
+}
+async function saveState(){
+  const json = JSON.stringify(STATE);
+  try{ if(window.storage){ await window.storage.set('state', json); } }catch(e){}
+  try{ if(window.localStorage){ window.localStorage.setItem(STORAGE_KEY, json); } }catch(e){}
+}
+function touchStreak(){
+  const today = new Date().toDateString();
+  if(STATE.lastActiveDate !== today){
+    const last = STATE.lastActiveDate ? new Date(STATE.lastActiveDate) : null;
+    if(last){
+      const diffDays = Math.round((new Date(today) - new Date(last.toDateString())) / 86400000);
+      STATE.streak = diffDays === 1 ? STATE.streak + 1 : 1;
+    } else { STATE.streak = 1; }
+    STATE.lastActiveDate = today;
+  }
+}
+function addXP(n){ STATE.xp += n; showXPToast(n); }
+function showXPToast(n){
+  const t = document.createElement('div');
+  t.className='xp-toast'; t.textContent = '+ '+n+' XP';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1400);
+}
+
+/* ============ TTS ============ */
+function speak(text, lang){
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang; u.rate = lang.startsWith('zh') ? 0.85 : 0.92;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function norm(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s']/g,' ').replace(/\s+/g,' ').trim();
+}
+function wordOverlapScore(target, said){
+  const t = norm(target).split(' ').filter(Boolean);
+  const s = new Set(norm(said).split(' ').filter(Boolean));
+  if(t.length===0) return {pct:0, words:[]};
+  let hit=0;
+  const words = t.map(w=>{ const ok = s.has(w); if(ok) hit++; return {w, ok}; });
+  return {pct: Math.round(100*hit/t.length), words};
+}
+function stripCn(s){ return (s||'').replace(/[^\u4e00-\u9fff]/g,''); }
+function charOverlapScore(target, said){
+  const t = stripCn(target).split('');
+  const pool = stripCn(said).split('');
+  if(t.length===0) return {pct:0, words:[]};
+  let hit=0;
+  const words = t.map(ch=>{
+    const pos = pool.indexOf(ch);
+    const ok = pos>=0;
+    if(ok){ hit++; pool.splice(pos,1); }
+    return {w:ch, ok};
+  });
+  return {pct: Math.round(100*hit/t.length), words};
+}
+// Accepts either Hanzi or toneless Pinyin for a Chinese-writing answer.
+function checkCnAnswer(sentence, said){
+  const hasHan = /[\u4e00-\u9fff]/.test(said||'');
+  if(hasHan){
+    const sc = charOverlapScore(sentence.c, said);
+    return {pct: sc.pct, ok: sc.pct>=70, mode:'hanzi', words: sc.words};
+  }
+  const sc = wordOverlapScore(sentence.y, said);
+  return {pct: sc.pct, ok: sc.pct>=70, mode:'pinyin', words: sc.words};
+}
+function pickLang(mode, i){
+  if(mode==='en') return 'en';
+  if(mode==='cn') return 'cn';
+  return i%2===0 ? 'en' : 'cn';
+}
+
+/* ============ REVIEW POOL ============ */
+function pushWrong(day, skill, idx, meta){
+  const key = day+'-'+skill+'-'+idx;
+  let item = STATE.wrongPool.find(w=>w.key===key);
+  if(item){ item.count++; } else { STATE.wrongPool.push({key, day, skill, idx, count:1, meta}); }
+}
+function resolveWrong(key){
+  const item = STATE.wrongPool.find(w=>w.key===key);
+  if(item){ item.count--; if(item.count<=0) STATE.wrongPool = STATE.wrongPool.filter(w=>w.key!==key); }
+}
+
+/* ============ EXERCISE GENERATORS ============ */
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function pick(arr,n){ return shuffle(arr).slice(0,n); }
+
+function genReadingQs(day, count, mode){
+  mode = mode || 'both';
+  const S = day.sentences; const qs = [];
+  const idxs = pick(S.map((_,i)=>i), Math.min(count, S.length));
+  idxs.forEach((idx,k)=>{
+    const s = S[idx];
+    const lang = pickLang(mode, k);
+    const variant = k % 3;
+    if(lang==='en'){
+      if(variant!==2){
+        const distractors = pick(S.filter((_,i)=>i!==idx).map(x=>x.v), 3);
+        const options = shuffle([s.v, ...distractors]);
+        qs.push({kind:'mcq', skill:'reading', idx, lang, prompt:s.e, sub:'🇬🇧 Đọc câu tiếng Anh, chọn nghĩa tiếng Việt đúng:', options, answer: options.indexOf(s.v), sentence:s});
+      } else {
+        const words = s.e.replace(/[.?!]/g,'').split(' ');
+        const blankPos = Math.max(1, Math.floor(words.length/2));
+        const answerWord = words[blankPos].replace(/[,]/g,'');
+        const masked = words.map((w,i)=> i===blankPos ? '_____' : w).join(' ');
+        qs.push({kind:'fill', skill:'reading', idx, lang, prompt: masked, sub:'🇬🇧 Điền từ tiếng Anh còn thiếu:', vi:s.v, answer: answerWord.toLowerCase(), sentence:s});
+      }
+    } else {
+      if(variant===0){
+        const distractors = pick(S.filter((_,i)=>i!==idx).map(x=>x.v), 3);
+        const options = shuffle([s.v, ...distractors]);
+        qs.push({kind:'mcq', skill:'reading', idx, lang, prompt:s.c, sub:'🇨🇳 Đọc câu tiếng Trung, chọn nghĩa tiếng Việt đúng:', options, answer: options.indexOf(s.v), sentence:s});
+      } else if(variant===1){
+        const distractors = pick(S.filter((_,i)=>i!==idx).map(x=>x.y), 3);
+        const options = shuffle([s.y, ...distractors]);
+        qs.push({kind:'mcq', skill:'reading', idx, lang, prompt:s.c, sub:'🇨🇳 Chọn phiên âm Pinyin đúng cho câu này:', options, answer: options.indexOf(s.y), sentence:s});
+      } else {
+        const pyWords = s.y.replace(/[.?!]/g,'').split(' ');
+        const blankPos = Math.max(1, Math.floor(pyWords.length/2));
+        const answerWord = pyWords[blankPos].replace(/[,]/g,'');
+        const masked = pyWords.map((w,i)=> i===blankPos ? '_____' : w).join(' ');
+        qs.push({kind:'fill', skill:'reading', idx, lang, prompt: s.c+'\n'+masked, sub:'🇨🇳 Điền âm Pinyin còn thiếu:', vi:s.v, answer: answerWord.toLowerCase(), sentence:s});
+      }
+    }
+  });
+  return qs;
+}
+
+function genListeningQs(day, count, mode){
+  mode = mode || 'both';
+  const S = day.sentences; const qs=[];
+  const idxs = pick(S.map((_,i)=>i), Math.min(count, S.length));
+  idxs.forEach((idx,k)=>{
+    const s = S[idx];
+    const lang = pickLang(mode, k);
+    const audio = lang==='en' ? s.e : s.c;
+    if(k%2===0){
+      const distractors = pick(S.filter((_,i)=>i!==idx).map(x=>x.v), 3);
+      const options = shuffle([s.v, ...distractors]);
+      qs.push({kind:'mcq', skill:'listening', idx, lang, audio, sub:(lang==='en'?'🇬🇧':'🇨🇳')+' Nghe và chọn nghĩa đúng:', options, answer: options.indexOf(s.v), sentence:s});
+    } else if(lang==='en'){
+      qs.push({kind:'type', skill:'listening', idx, lang, audio, sub:'🇬🇧 Nghe và gõ lại câu tiếng Anh:', answer: s.e, sentence:s});
+    } else {
+      qs.push({kind:'type', skill:'listening', idx, lang, audio, sub:'🇨🇳 Nghe rồi gõ lại (Hán tự hoặc Pinyin không dấu):', answer: s.y, sentence:s});
+    }
+  });
+  return qs;
+}
+
+function genWritingQs(day, count, mode){
+  mode = mode || 'both';
+  const S = day.sentences; const qs=[];
+  const idxs = pick(S.map((_,i)=>i), Math.min(count, S.length));
+  idxs.forEach((idx,k)=>{
+    const s = S[idx];
+    const lang = pickLang(mode, k);
+    if(lang==='en'){
+      qs.push({kind:'write', skill:'writing', idx, lang, prompt:s.v, sub:'🇬🇧 Viết câu tiếng Anh tương ứng:', answer: s.e, sentence:s});
+    } else {
+      qs.push({kind:'write', skill:'writing', idx, lang, prompt:s.v, sub:'🇨🇳 Viết câu tiếng Trung tương ứng (Hán tự hoặc Pinyin không dấu đều được):', answer: s.y, sentence:s});
+    }
+  });
+  return qs;
+}
+
+function genVocabQs(day, count){
+  const V = day.vocab; const qs=[];
+  const n = Math.min(count, V.length);
+  const idxs = pick(V.map((_,i)=>i), n);
+  idxs.forEach((idx,k)=>{
+    const v = V[idx];
+    const lang = pickLang('both', k);
+    const distractors = pick(V.filter((_,i)=>i!==idx).map(x=>x.vi).concat(
+      DATA.flatMap(d=>d.vocab.map(x=>x.vi))
+    ), 6).filter(x=>x!==v.vi).slice(0,3);
+    const options = shuffle([v.vi, ...distractors]);
+    const prompt = lang==='en' ? v.en : (v.cn+' ('+v.py+')');
+    qs.push({kind:'mcq', skill:'vocab', idx, lang, prompt, sub:(lang==='en'?'🇬🇧':'🇨🇳')+' Chọn nghĩa tiếng Việt đúng:', options, answer: options.indexOf(v.vi)});
+  });
+  return qs;
+}
+
+function genGrammarQs(day, count){
+  const pool = (day.gramCore && day.gramCore.length) ? day.gramCore : [{en:'S + V + O',cn:'S + V + O',note:'Câu cơ bản'}];
+  const qs = [];
+  for(let k=0;k<count;k++){
+    const g = pool[k % pool.length];
+    let others = pool.filter(x=>x.en!==g.en).map(x=>x.en);
+    if(others.length<2){
+      const otherPool = DATA.flatMap(dd=>dd.gramCore||[]).map(x=>x.en).filter(x=>x!==g.en);
+      others = Array.from(new Set(others.concat(otherPool)));
+    }
+    const distractors = pick(Array.from(new Set(others)), Math.min(2, others.length));
+    const options = shuffle([g.en, ...distractors]);
+    const prompt = (g.note && g.note.trim()) ? ('Cấu trúc nào phù hợp để diễn tả: "'+g.note+'"?') : ('Cấu trúc nào tương ứng với mẫu tiếng Trung: '+g.cn+' ?');
+    qs.push({kind:'mcq', skill:'grammar', idx:k, prompt, sub:'', options, answer: options.indexOf(g.en)});
+  }
+  return qs;
+}
+
+/* ============ ROUTER ============ */
+let VIEW = 'home';
+let EX = null;
+
+function go(view){ VIEW = view; render(); window.scrollTo(0,0); }
+function currentDayData(){ return DATA.find(d=>d.id===STATE.currentDay); }
+function dayProgress(d){
+  const p = STATE.days[d.id];
+  const done = STEP_KEYS.filter(k=>p.stepsDone[k]).length;
+  return Math.round(100*done/STEP_KEYS.length);
+}
+
+async function init(){
+  await loadState();
+  touchStreak();
+  await saveState();
+  render();
+}
+
+/* ============ RENDER ============ */
+function render(){
+  const app = document.getElementById('app');
+  if(VIEW==='home') app.innerHTML = renderHome();
+  else if(VIEW==='lesson') app.innerHTML = renderLesson();
+  else if(VIEW==='review') app.innerHTML = renderReview();
+}
+
+function topBar(title, sub, showBack){
+  return `<div class="topbar">
+    ${showBack? `<button class="back" data-action="go-home">←</button>` : `<div style="width:26px"></div>`}
+    <div style="text-align:center"><div class="title">${title}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>
+    <div class="stat-pill">🔥 ${STATE.streak}</div>
+  </div>`;
+}
+
+function renderHome(){
+  let html = `<div class="home-hero">
+    <div class="greet">Học viên Logistics</div>
+    <h1>Bạn đang học Ngày ${STATE.currentDay}</h1>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">${STATE.xp}</div><div class="lbl">Điểm XP</div></div>
+      <div class="hero-stat"><div class="num">${STATE.streak}🔥</div><div class="lbl">Streak</div></div>
+      <div class="hero-stat"><div class="num">${STATE.wrongPool.length}</div><div class="lbl">Cần ôn tập</div></div>
+    </div>
+  </div>`;
+
+  const d = currentDayData();
+  const pct = dayProgress(d);
+  const stepLabel = STEP_LABELS[STEP_KEYS[STATE.currentStep]] || 'Học câu';
+  html += `<button class="continue-btn" data-action="continue-learning">
+    <span>Tiếp tục học →<small>Ngày ${d.id}: ${d.vi} · Bước ${STATE.currentStep+1} (${stepLabel})</small></span>
+  </button>`;
+
+  if(STATE.wrongPool.length>0){
+    html += `<div class="review-card"><h4>🔄 Ôn tập hôm nay</h4>
+      <p>Bạn có ${STATE.wrongPool.length} nội dung cần ôn lại. Ôn nhanh 2 phút để nhớ lâu hơn.</p>
+      <button class="review-btn" data-action="open-review">Bắt đầu ôn tập</button></div>`;
+  }
+
+  html += `<div class="route"><div class="route-title">Lộ trình 8 ngày</div>`;
+  DATA.forEach((day,i)=>{
+    const p = STATE.days[day.id];
+    const locked = !p.unlocked;
+    const active = day.id===STATE.currentDay && !p.completed;
+    const dp = dayProgress(day);
+    html += `<div class="port">
+      <div class="track">
+        <div class="dot ${p.completed?'done':(active?'active':'')} ${locked?'locked':''}">${p.completed?'✓':(locked?'🔒':day.id)}</div>
+        ${i<DATA.length-1?`<div class="rope ${p.completed?'done':''}"></div>`:''}
+      </div>
+      <div class="port-card ${locked?'locked':''}" ${locked?'':`data-action="open-day" data-day="${day.id}"`}>
+        <div class="d-num">NGÀY ${String(day.id).padStart(2,'0')}</div>
+        <h3>${day.vi}</h3>
+        <div class="d-en">${day.en}</div>
+        <div class="progress-bar"><i style="width:${dp}%"></i></div>
+        <div class="pct">${dp}% hoàn thành${p.testScore!=null?' · Điểm KT: '+p.testScore:''}</div>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<div style="text-align:center;padding:6px 20px 18px">
+    <button class="tiny-btn" data-action="reset-data" style="color:var(--muted)">↺ Làm mới dữ liệu (xoá tiến trình)</button>
+  </div>`;
+  return html;
+}
+
+function stepsRow(){
+  return `<div class="steps-row">${STEP_KEYS.map((k,i)=>{
+    const p = STATE.days[STATE.currentDay];
+    let cls = '';
+    if(p.stepsDone[k]) cls='done';
+    if(i===STATE.currentStep) cls='current';
+    return `<div class="step-chip ${cls}"></div>`;
+  }).join('')}</div>`;
+}
+
+function renderLesson(){
+  const d = currentDayData();
+  const stepKey = STEP_KEYS[STATE.currentStep];
+  const p = STATE.days[d.id];
+  let body = '';
+  if(stepKey==='sentences') body = renderSentenceFlow(d,p);
+  else if(['reading','listening','writing'].includes(stepKey)) body = renderSkillExercise(d,p,stepKey);
+  else if(stepKey==='test') body = renderTest(d,p);
+  return topBar('Ngày '+d.id+' · '+STEP_LABELS[stepKey], d.vi, true) + stepsRow() + body;
+}
+
+/* ---- SENTENCE FLOW (each sentence = 1 page, then summary) ---- */
+function renderSentenceFlow(d,p){
+  if(window.__sentPhase==='summary') return renderDaySummary(d,p);
+  const i = window.__sentIdx||0;
+  const s = d.sentences[i];
+  const hard = p.hardSentences.includes(i);
+  const isLast = i>=d.sentences.length-1;
+
+  const vocabHtml = (s.vocab||[]).map(v=>`<div class="mini-vocab-item">
+      <div class="row1"><span class="w-en">${v.en}</span><span class="w-pos">${v.pos||''}</span><span class="w-ipa">${v.ipa||''}</span></div>
+      <div class="row2"><span class="w-cn">${v.cn}</span> · <span class="w-py">${v.py}</span> = <span class="w-vi">${v.vi}</span></div>
+    </div>`).join('');
+  const gramHtml = (s.gram||[]).map(g=>`<div class="gram-pattern">
+      <div class="formula-box">🇬🇧 ${g.en}<br>🇨🇳 ${g.cn}</div>
+      ${g.note?`<div class="note">→ ${g.note}</div>`:''}
+    </div>`).join('');
+
+  const wa = window.__wfAnswered;
+  let writeFb = '';
+  if(wa){
+    const enSc = wordOverlapScore(s.e, window.__wfEn||'');
+    const cnSc = checkCnAnswer(s, window.__wfCn||'');
+    writeFb = `<div class="fb ${enSc.pct>=70?'ok':'bad'}">🇬🇧 ${enSc.pct>=70?'✅ Tốt!':'❌ Chưa khớp đủ'} (khớp ${enSc.pct}%) — Đáp án: <b>${s.e}</b></div>
+      <div class="fb ${cnSc.ok?'ok':'bad'}" style="margin-top:8px">🇨🇳 ${cnSc.ok?'✅ Tốt!':'❌ Chưa khớp đủ'} (khớp ${cnSc.pct}% theo ${cnSc.mode==='hanzi'?'Hán tự':'Pinyin'}) — Đáp án: <b>${s.c}</b> / <b>${s.y}</b></div>`;
+  }
+
+  return `<div class="content">
+    <div class="sent-progress">CÂU ${i+1} / ${d.sentences.length}</div>
+    <div class="scard">
+      <div class="vi">🇻🇳 ${s.v}</div>
+      <div class="en">🇬🇧 ${s.e}</div>
+      <div class="ipa">${s.f}</div>
+      <div class="cn">🇨🇳 ${s.c}</div>
+      <div class="py">${s.y}</div>
+      <div class="toolrow">
+        <button class="tiny-btn" data-action="speak" data-lang="en-US" data-text="${escAttr(s.e)}">🔊 Nghe EN</button>
+        <button class="tiny-btn" data-action="speak" data-lang="zh-CN" data-text="${escAttr(s.c)}">🔊 Nghe 中</button>
+        <button class="tiny-btn ${hard?'on':''}" data-action="toggle-hard" data-idx="${i}">${hard?'★ Câu khó':'☆ Đánh dấu khó'}</button>
+      </div>
+    </div>
+
+    <div class="mini-box"><h4>📇 Từ vựng</h4>${vocabHtml || '<div class="mini-vocab-item">Không có mục nổi bật</div>'}</div>
+    <div class="mini-box"><h4>📐 Ngữ pháp</h4>${gramHtml}</div>
+
+    <div class="write-box">
+      <h4>✍️ Luyện viết</h4>
+      <div class="prompt-vi">🇻🇳 ${s.v}</div>
+      <label>Viết lại bằng tiếng Anh:</label>
+      <input class="text-input" id="wf-en" value="${escAttr(window.__wfEn||'')}" placeholder="Type in English..."/>
+      <label>Viết lại bằng tiếng Trung (Hán tự hoặc Pinyin không dấu):</label>
+      <input class="text-input" id="wf-cn" value="${escAttr(window.__wfCn||'')}" placeholder="中文 hoặc ni neng gei wo..."/>
+      ${wa?'':'<button class="check-btn" data-action="check-write-flow">Kiểm tra</button>'}
+      ${writeFb}
+    </div>
+
+    <div class="sent-nav">
+      ${i>0?`<button class="ghost-btn" data-action="sent-prev">← Câu trước</button>`:''}
+      <button class="primary-btn amber" data-action="sent-next">${isLast? 'Xem tổng hợp →' : 'Câu tiếp theo →'}</button>
+    </div>
+  </div>`;
+}
+
+function renderDaySummary(d,p){
+  const vocabRows = (d.vocab||[]).map(v=>`<div class="mini-vocab-item">
+      <div class="row1"><span class="w-en">${v.en}</span><span class="w-pos">${v.pos||''}</span><span class="w-ipa">${v.ipa||''}</span></div>
+      <div class="row2"><span class="w-cn">${v.cn}</span> · <span class="w-py">${v.py}</span> = <span class="w-vi">${v.vi}</span></div>
+    </div>`).join('');
+  const gramRows = (d.gramCore||[]).map(g=>`<div class="gram-pattern">
+      <div class="formula-box">🇬🇧 ${g.en}<br>🇨🇳 ${g.cn}</div>
+      ${g.note?`<div class="note">→ ${g.note}</div>`:''}
+    </div>`).join('');
+  return `<div class="content">
+    <div class="eyebrow">TỔNG HỢP NGÀY ${d.id}</div>
+    <h2 class="step-h">📚 Từ vựng & Ngữ pháp cốt lõi</h2>
+    <div class="step-desc">Ôn nhanh toàn bộ từ vựng và cấu trúc đã học trong ${d.sentences.length} câu hôm nay trước khi chuyển sang luyện tập.</div>
+    <div class="summary-section">
+      <div class="mini-box"><h4>📇 Từ vựng cốt lõi (${(d.vocab||[]).length})</h4>${vocabRows}</div>
+    </div>
+    <div class="summary-section">
+      <div class="mini-box"><h4>📐 Cấu trúc ngữ pháp cần học (${(d.gramCore||[]).length})</h4>${gramRows}</div>
+    </div>
+  </div>
+  ${footerBtn('Tiếp tục → Đọc', "data-action='sentences-done'")}`;
+}
+
+/* ---- GENERIC SKILL EXERCISE (reading / listening / writing) ---- */
+function modeTabs(){
+  const modes = [['en','🇬🇧 English'],['cn','🇨🇳 中文'],['both','🌐 Cả hai']];
+  return `<div class="level-tabs">${modes.map(([val,label])=>
+    `<button class="level-tab ${((STATE.mode||'both')===val)?'active':''}" data-action="set-mode" data-mode="${val}">${label}</button>`
+  ).join('')}</div>`;
+}
+function ensureExercise(d,p,stepKey){
+  const mode = STATE.mode || 'both';
+  if(EX && EX.day===d.id && EX.step===stepKey && EX.mode===mode) return;
+  let qs = [];
+  if(stepKey==='reading') qs = genReadingQs(d,6,mode);
+  else if(stepKey==='listening') qs = genListeningQs(d,6,mode);
+  else if(stepKey==='writing') qs = genWritingQs(d,6,mode);
+  EX = {day:d.id, step:stepKey, mode, qs, i:0, correctCount:0, done:false};
+}
+
+function renderSkillExercise(d,p,stepKey){
+  ensureExercise(d,p,stepKey);
+  if(EX.done){
+    return `<div class="content">
+      <div class="eyebrow">${STEP_ICONS[stepKey]} ${STEP_LABELS[stepKey].toUpperCase()}</div>
+      <h2 class="step-h">${STEP_ICONS[stepKey]} ${STEP_LABELS[stepKey]} — Hoàn thành</h2>
+      <div class="q-card" style="text-align:center">
+        <div style="font-size:40px">🎉</div>
+        <p style="font-size:15px;margin:8px 0">Đúng ${EX.correctCount}/${EX.qs.length} câu.</p>
+      </div>
+    </div>
+    ${footerBtn('Tiếp tục →', `data-action='step-done' data-step='${stepKey}'`)}`;
+  }
+  const q = EX.qs[EX.i];
+  const stepDesc = {
+    reading:'Đọc câu và chọn / điền đáp án đúng. Chuyển chế độ để luyện riêng tiếng Anh, tiếng Trung (Pinyin), hoặc cả hai.',
+    listening:'Nghe câu rồi chọn hoặc gõ lại nội dung (tiếng Anh hoặc tiếng Trung tuỳ chế độ).',
+    writing:'Nhìn nghĩa tiếng Việt, viết lại câu tiếng Anh hoặc tiếng Trung tương ứng (chấp nhận Hán tự hoặc Pinyin không dấu).'
+  }[stepKey];
+  return `<div class="content">
+    <div class="eyebrow">CÂU ${EX.i+1}/${EX.qs.length}</div>
+    <h2 class="step-h">${STEP_ICONS[stepKey]} ${STEP_LABELS[stepKey]}</h2>
+    <div class="step-desc">${stepDesc}</div>
+    ${modeTabs()}
+    <div id="ex-slot">${renderQuestion(q, stepKey)}</div>
+  </div>`;
+}
+
+function renderQuestion(q, stepKey){
+  if(q.skill==='listening'){
+    const ttsLang = q.lang==='cn' ? 'zh-CN' : 'en-US';
+    let inner = `<div class="q-card">
+      <div class="q-num">NGHE VÀ TRẢ LỜI ${q.lang==='cn'?'🇨🇳':'🇬🇧'}</div>
+      <button class="play-big" data-action="speak" data-lang="${ttsLang}" data-text="${escAttr(q.audio)}">🔊 Nghe câu</button>`;
+    if(q.kind==='mcq'){
+      inner += renderMcqOptions(q);
+    } else {
+      inner += `<input class="text-input" id="type-ans" placeholder="${q.lang==='cn'?'Gõ lại Hán tự hoặc Pinyin...':'Gõ lại câu tiếng Anh bạn nghe được...'}" ${window.__answered?'disabled':''} value="${escAttr(window.__typedVal||'')}"/>
+      ${window.__answered? '' : `<button class="check-btn" data-action="submit-type">Kiểm tra</button>`}
+      ${window.__answered? renderTypeFeedback(q) : ''}`;
+    }
+    inner += `</div>`;
+    return inner;
+  }
+  if(q.kind==='mcq'){
+    return `<div class="q-card"><div class="q-num">CÂU HỎI</div><div class="q-text">${q.prompt}</div><div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">${q.sub||''}</div>${renderMcqOptions(q)}</div>`;
+  }
+  if(q.kind==='fill'){
+    return `<div class="q-card"><div class="q-num">ĐIỀN TỪ CÒN THIẾU ${q.lang==='cn'?'🇨🇳':'🇬🇧'}</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">🇻🇳 ${q.vi}</div>
+      <div class="q-text">${q.prompt.replace(/\n/g,'<br>')}</div>
+      <input class="text-input" id="type-ans" placeholder="${q.lang==='cn'?'Nhập âm Pinyin còn thiếu...':'Nhập từ còn thiếu...'}" ${window.__answered?'disabled':''} value="${escAttr(window.__typedVal||'')}"/>
+      ${window.__answered? '' : `<button class="check-btn" data-action="submit-type">Kiểm tra</button>`}
+      ${window.__answered? renderTypeFeedback(q) : ''}
+    </div>`;
+  }
+  if(q.kind==='write'){
+    return `<div class="q-card"><div class="q-num">VIẾT CÂU ${q.lang==='cn'?'🇨🇳':'🇬🇧'}</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">🇻🇳</div>
+      <div class="q-text">${q.prompt}</div>
+      <textarea class="text-input" id="type-ans" rows="3" placeholder="${q.lang==='cn'?'Hán tự hoặc Pinyin không dấu...':'Viết câu tiếng Anh...'}" ${window.__answered?'disabled':''}>${window.__typedVal||''}</textarea>
+      ${window.__answered? '' : `<button class="check-btn" data-action="submit-write">Chấm điểm</button>`}
+      ${window.__answered? renderWriteFeedback(q) : ''}
+    </div>`;
+  }
+  return '';
+}
+function renderMcqOptions(q){
+  const picked = window.__answered ? window.__pickedIdx : undefined;
+  return q.options.map((o,i)=>{
+    let cls='opt';
+    if(picked!==undefined){
+      if(i===q.answer) cls+=' correct'; else if(i===picked) cls+=' wrong';
+    }
+    return `<button class="${cls}" data-action="pick-mcq" data-idx="${i}" ${picked!==undefined?'disabled':''}>${o}</button>`;
+  }).join('') + (picked!==undefined ? mcqFeedback(q,picked) : '');
+}
+function mcqFeedback(q,picked){
+  const ok = picked===q.answer;
+  return `<div class="fb ${ok?'ok':'bad'}">${ok?'✅ Chính xác!':'❌ Đáp án đúng: '+q.options[q.answer]}</div>
+    <button class="check-btn" style="margin-top:12px" data-action="next-q">Câu tiếp theo →</button>`;
+}
+function renderTypeFeedback(q){
+  const said = window.__typedVal||'';
+  let ok, detail='';
+  if(q.kind==='type' && q.lang==='cn'){
+    const sc = checkCnAnswer(q.sentence, said);
+    ok = sc.ok;
+    detail = ` (khớp ${sc.pct}% theo ${sc.mode==='hanzi'?'Hán tự':'Pinyin'})`;
+  } else {
+    ok = norm(said)===norm(q.answer);
+  }
+  return `<div class="fb ${ok?'ok':'bad'}">${ok?'✅ Chính xác!'+detail:'❌ Chưa đúng'+detail+'. Đáp án đúng: "'+q.answer+'"'}</div>
+    <button class="check-btn" style="margin-top:12px" data-action="next-q">Câu tiếp theo →</button>`;
+}
+function renderWriteFeedback(q){
+  const said = window.__typedVal||'';
+  let sc, label;
+  if(q.lang==='cn'){
+    sc = checkCnAnswer(q.sentence, said);
+    label = 'khớp '+sc.pct+'% theo '+(sc.mode==='hanzi'?'Hán tự':'Pinyin');
+  } else {
+    sc = wordOverlapScore(q.answer, said);
+    sc.ok = sc.pct>=70;
+    label = 'khớp '+sc.pct+'% từ khoá';
+  }
+  const wordsHtml = (sc.words||[]).map(w=>`<span class="word-score ${w.ok?'hit':'miss'}">${w.w}</span>`).join(' ');
+  return `<div class="fb ${sc.ok?'ok':'bad'}">${sc.ok?'✅ Tốt! '+label+'.':'❌ Chưa đạt — '+label+' (cần ≥70%).'}
+    <div style="margin-top:8px">Đáp án mẫu: <b>${q.answer}</b>${q.lang==='cn'?' / <b>'+q.sentence.c+'</b>':''}</div>
+    <div style="margin-top:6px">${wordsHtml}</div></div>
+    <button class="check-btn" style="margin-top:12px" data-action="next-q" data-ok="${sc.ok}">Câu tiếp theo →</button>`;
+}
+
+/* ---- TEST ---- */
+function buildTest(d){
+  return {
+    'Từ vựng': genVocabQs(d,5),
+    'Ngữ pháp': genGrammarQs(d,5),
+    'Đọc': genReadingQs(d,5,'both'),
+    'Nghe': genListeningQs(d,5,'both'),
+    'Viết': genWritingQs(d,5,'both'),
+  };
+}
+function renderTest(d,p){
+  if(!EX || EX.day!==d.id || EX.step!=='test'){
+    const cats = buildTest(d);
+    const flat = [];
+    Object.entries(cats).forEach(([cat,qs])=>qs.forEach(q=>flat.push({...q, cat})));
+    EX = {day:d.id, step:'test', qs: flat, i:0, correctCount:0, done:false, catStats:{}};
+  }
+  if(EX.done){ return renderTestResult(d,p); }
+  const q = EX.qs[EX.i];
+  return `<div class="content">
+    <div class="eyebrow">KIỂM TRA CUỐI NGÀY · CÂU ${EX.i+1}/${EX.qs.length} · ${q.cat.toUpperCase()}</div>
+    <h2 class="step-h">🏁 Kiểm tra tổng hợp</h2>
+    ${renderQuestion(q, q.kind==='write'?'writing':(q.skill==='listening'?'listening':'reading'))}
+  </div>`;
+}
+function renderTestResult(d,p){
+  const score = p.testScore;
+  const pass = score>=80;
+  return `<div class="content">
+    <div class="score-ring" style="background:conic-gradient(${pass?'var(--green)':'var(--amber)'} ${score*3.6}deg, var(--line) 0)">
+      <div style="background:var(--paper);width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div class="num">${score}</div><div class="lbl">/ 100</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-bottom:18px;font-weight:800;font-size:16px;color:${pass?'var(--green)':'var(--amber-dk)'}">
+      ${pass? '🎉 Đạt! Ngày '+d.id+' đã hoàn thành' : '⚠️ Chưa đạt 80 điểm — hãy học lại phần yếu'}
+    </div>
+    <div class="q-card">
+      ${Object.entries(p.testCats||{}).map(([cat,st])=>`<div class="cat-row"><span>${cat}</span><b>${st.correct}/${st.total}</b></div>`).join('')}
+    </div>
+  </div>
+  ${footerBtn(pass? 'Về trang chủ →' : 'Làm lại bài kiểm tra', `data-action='${pass?'go-home':'retry-test'}'`)}`;
+}
+
+/* ---- REVIEW ---- */
+function renderReview(){
+  const pool = STATE.wrongPool.slice().sort((a,b)=>b.count-a.count);
+  if(pool.length===0){
+    return topBar('Ôn tập hôm nay','',true) + `<div class="content"><div class="empty-note">🎉 Không còn nội dung cần ôn tập. Bạn đang học rất tốt!</div></div>`;
+  }
+  const item = pool[0];
+  const day = DATA.find(x=>x.id===item.day);
+  let text='', vi='', cn='';
+  if(item.skill==='vocab'){
+    const v = day.vocab[item.idx % day.vocab.length];
+    text=v.en; vi=v.vi; cn=v.cn+' · '+v.py;
+  } else if(item.skill==='grammar'){
+    const g = (day.gramCore||[])[item.idx % Math.max(1,(day.gramCore||[]).length)] || {en:'',cn:'',note:''};
+    text=g.en; vi=g.note||''; cn=g.cn;
+  } else {
+    const s = day.sentences[item.idx % day.sentences.length];
+    text=s.e; vi=s.v; cn=s.c+' · '+s.y;
+  }
+  return topBar('Ôn tập hôm nay', pool.length+' mục cần ôn', true) + `
+  <div class="content">
+    <div class="step-desc">Nội dung sai nhiều lần sẽ xuất hiện thường xuyên hơn cho đến khi bạn nhớ được.</div>
+    <div class="q-card" style="text-align:center">
+      <div class="q-num">NGÀY ${item.day} · ${item.skill.toUpperCase()} · SAI ${item.count} LẦN</div>
+      <div class="q-text" style="font-size:19px">${text}</div>
+      <button class="icon-btn" style="margin:8px auto" data-action="speak" data-lang="en-US" data-text="${escAttr(text)}">🔊 Nghe</button>
+      <div id="review-answer" class="${window.__reviewShown?'':'hidden'}">
+        <p style="margin-top:10px">🇻🇳 ${vi}</p>
+        <p style="color:var(--teal)">🇨🇳 ${cn}</p>
+      </div>
+      ${window.__reviewShown ? '' : `<button class="check-btn" style="margin-top:10px" data-action="review-show">Xem đáp án</button>`}
+    </div>
+    ${window.__reviewShown ? `<div style="display:flex;gap:10px">
+      <button class="ghost-btn" data-action="review-answer" data-key="${item.key}" data-ok="0">Vẫn còn sai</button>
+      <button class="primary-btn amber" data-action="review-answer" data-key="${item.key}" data-ok="1">Nhớ rồi ✓</button>
+    </div>` : ''}
+  </div>`;
+}
+
+/* ---- helpers ---- */
+function footerBtn(label, attrs){
+  return `<div class="footer-bar"><div class="inner"><button class="primary-btn amber" ${attrs}>${label}</button></div></div>`;
+}
+function escAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+/* ============ EVENTS ============ */
+document.addEventListener('input', (e)=>{
+  if(e.target.id==='type-ans'){ window.__typedVal = e.target.value; }
+  if(e.target.id==='wf-en'){ window.__wfEn = e.target.value; }
+  if(e.target.id==='wf-cn'){ window.__wfCn = e.target.value; }
+});
+
+document.addEventListener('click', async (e)=>{
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  try{
+    await handleAction(el);
+  }catch(err){
+    console.error('App error on action', el.dataset.action, err);
+    EX = null;
+    window.__resetLocalUi();
+    STATE.currentStep = 0;
+    try{ await saveState(); }catch(e2){}
+    VIEW = 'home';
+    render();
+    const banner = document.createElement('div');
+    banner.className = 'xp-toast';
+    banner.style.background = 'var(--red)';
+    banner.textContent = 'Có lỗi nhỏ, đã đưa bạn về trang chủ. Nếu lặp lại, bấm "Làm mới dữ liệu" ở cuối trang.';
+    document.body.appendChild(banner);
+    setTimeout(()=>banner.remove(), 3200);
+  }
+});
+
+async function handleAction(el){
+  const action = el.dataset.action;
+
+  if(action==='reset-data'){
+    if(!confirm('Xoá toàn bộ tiến trình học và bắt đầu lại từ Ngày 1?')) return;
+    STATE = defaultState();
+    EX = null; window.__resetLocalUi();
+    try{ if(window.storage) await window.storage.delete('state'); }catch(e){}
+    try{ if(window.localStorage) window.localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    await saveState();
+    go('home');
+  }
+
+  else if(action==='go-home'){ EX=null; window.__resetLocalUi(); await saveState(); go('home'); }
+
+  else if(action==='continue-learning'){ window.__resetLocalUi(); go('lesson'); }
+
+  else if(action==='open-day'){
+    const dayId = parseInt(el.dataset.day,10);
+    if(STATE.days[dayId].unlocked){ STATE.currentDay = dayId; STATE.currentStep = 0; EX=null; window.__resetLocalUi(); await saveState(); go('lesson'); }
+  }
+
+  else if(action==='open-review'){ window.__reviewShown=false; go('review'); }
+
+  else if(action==='speak'){ speak(el.dataset.text, el.dataset.lang); }
+
+  else if(action==='toggle-hard'){
+    const idx = parseInt(el.dataset.idx,10);
+    const p = STATE.days[STATE.currentDay];
+    const pos = p.hardSentences.indexOf(idx);
+    if(pos>=0) p.hardSentences.splice(pos,1); else { p.hardSentences.push(idx); pushWrong(STATE.currentDay,'sentence',idx); }
+    await saveState(); render();
+  }
+
+  else if(action==='check-write-flow'){
+    window.__wfEn = document.getElementById('wf-en').value;
+    window.__wfCn = document.getElementById('wf-cn').value;
+    window.__wfAnswered = true;
+    await saveState();
+    render();
+  }
+
+  else if(action==='sent-next'){
+    const d = currentDayData();
+    const i = window.__sentIdx||0;
+    if(i >= d.sentences.length-1){
+      window.__sentPhase = 'summary';
+    } else {
+      window.__sentIdx = i+1;
+      window.__wfAnswered=false; window.__wfEn=''; window.__wfCn='';
+    }
+    render();
+  }
+  else if(action==='sent-prev'){
+    const i = window.__sentIdx||0;
+    if(i>0){ window.__sentIdx = i-1; window.__wfAnswered=false; window.__wfEn=''; window.__wfCn=''; }
+    render();
+  }
+  else if(action==='sentences-done'){
+    const p = STATE.days[STATE.currentDay];
+    p.stepsDone.sentences = true;
+    STATE.currentStep = Math.min(1, STEP_KEYS.length-1);
+    window.__sentIdx=0; window.__sentPhase=null;
+    EX=null; window.__resetLocalUi();
+    await saveState(); render();
+  }
+
+  else if(action==='set-mode'){
+    STATE.mode = el.dataset.mode;
+    EX = null; window.__resetLocalUi();
+    await saveState(); render();
+  }
+
+  else if(action==='step-done'){
+    const step = el.dataset.step;
+    const p = STATE.days[STATE.currentDay];
+    p.stepsDone[step] = true;
+    const idx = STEP_KEYS.indexOf(step);
+    STATE.currentStep = Math.min(idx+1, STEP_KEYS.length-1);
+    EX=null; window.__resetLocalUi();
+    await saveState(); render();
+  }
+
+  else if(action==='pick-mcq'){
+    if(window.__answered) return;
+    window.__answered = true;
+    window.__pickedIdx = parseInt(el.dataset.idx,10);
+    const q = EX.qs[EX.i];
+    const ok = window.__pickedIdx===q.answer;
+    if(ok) EX.correctCount++; else pushWrong(STATE.currentDay, q.skill, q.idx);
+    if(EX.step==='test'){ recordCat(q.cat, ok); }
+    await saveState();
+    render();
+  }
+
+  else if(action==='submit-type'){
+    const val = document.getElementById('type-ans').value;
+    window.__typedVal = val; window.__answered = true;
+    const q = EX.qs[EX.i];
+    let ok;
+    if(q.kind==='type' && q.lang==='cn'){ ok = checkCnAnswer(q.sentence, val).ok; }
+    else { ok = norm(val)===norm(q.answer); }
+    if(ok) EX.correctCount++; else pushWrong(STATE.currentDay, q.skill, q.idx);
+    if(EX.step==='test'){ recordCat(q.cat, ok); }
+    await saveState();
+    render();
+  }
+
+  else if(action==='submit-write'){
+    const val = document.getElementById('type-ans').value;
+    window.__typedVal = val; window.__answered = true;
+    const q = EX.qs[EX.i];
+    let ok;
+    if(q.lang==='cn'){ ok = checkCnAnswer(q.sentence, val).ok; }
+    else { ok = wordOverlapScore(q.answer, val).pct >= 70; }
+    if(ok) EX.correctCount++; else pushWrong(STATE.currentDay, q.skill, q.idx);
+    if(EX.step==='test'){ recordCat(q.cat, ok); }
+    await saveState();
+    render();
+  }
+
+  else if(action==='next-q'){
+    EX.i++;
+    window.__answered=false; window.__pickedIdx=undefined; window.__typedVal='';
+    if(EX.i>=EX.qs.length){
+      EX.done = true;
+      if(EX.step==='test'){ finishTest(); }
+      else { finishSkillStep(); }
+    }
+    await saveState();
+    render();
+  }
+
+  else if(action==='retry-test'){ EX=null; await saveState(); go('lesson'); }
+
+  else if(action==='review-show'){ window.__reviewShown = true; render(); }
+  else if(action==='review-answer'){
+    const key = el.dataset.key; const ok = el.dataset.ok==='1';
+    if(ok) resolveWrong(key);
+    window.__reviewShown = false;
+    await saveState();
+    render();
+  }
+}
+
+function recordCat(cat, ok){
+  EX.catStats[cat] = EX.catStats[cat] || {correct:0,total:0};
+  EX.catStats[cat].total++;
+  if(ok) EX.catStats[cat].correct++;
+}
+function finishSkillStep(){
+  const p = STATE.days[STATE.currentDay];
+  const step = EX.step;
+  const acc = EX.correctCount/EX.qs.length;
+  addXP(Math.round(EX.correctCount*3));
+  if(acc>=0.6){ p.stepsDone[step]=true; }
+  const idx = STEP_KEYS.indexOf(step);
+  STATE.currentStep = Math.min(idx+1, STEP_KEYS.length-1);
+}
+function finishTest(){
+  const p = STATE.days[STATE.currentDay];
+  const total = EX.qs.length;
+  const score = Math.round(100*EX.correctCount/total);
+  p.testScore = score;
+  p.testCats = EX.catStats;
+  if(score>=80){
+    p.stepsDone.test = true;
+    p.completed = true;
+    addXP(50);
+    const d = currentDayData();
+    const nextDay = DATA.find(x=>x.id===d.id+1);
+    if(nextDay) STATE.days[nextDay.id].unlocked = true;
+  }
+}
+
+window.__resetLocalUi = function(){
+  window.__answered=false; window.__pickedIdx=undefined; window.__typedVal='';
+  window.__reviewShown=false;
+  window.__sentIdx=0; window.__sentPhase=null;
+  window.__wfAnswered=false; window.__wfEn=''; window.__wfCn='';
+};
+window.__resetLocalUi();
+
+init();
+</script>
+</body>
+</html>
